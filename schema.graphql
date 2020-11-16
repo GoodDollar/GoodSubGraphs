@@ -1,5 +1,12 @@
-type ExampleEntity @entity {
+type TotalSupplyHistory @entity {
   id: ID!
-  count: BigInt!
-  account: Bytes! # address
+  timestamp: BigInt!
+  totalSupply: BigInt!
+  goodDollar: GoodDollarToken!
+}
+
+type GoodDollarToken @entity {
+  id: ID!
+  totalSupply: BigInt!
+  totalSupplyHistory: [TotalSupplyHistory!]! @derivedFrom(field: "goodDollar")
 }

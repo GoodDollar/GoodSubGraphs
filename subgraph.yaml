@@ -1,4 +1,4 @@
-specVersion: 0.0.1
+specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 dataSources:
@@ -6,11 +6,11 @@ dataSources:
     name: GoodDollar
     network: mainnet
     source:
-      address: "0x67C5870b4A41D4Ebef24d2456547A03F1f3e094B"
+      address: '0x67C5870b4A41D4Ebef24d2456547A03F1f3e094B'
       abi: GoodDollar
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.2
+      apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
         - MinterAdded

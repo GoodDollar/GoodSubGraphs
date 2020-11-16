@@ -1,4 +1,4 @@
-import { BigInt } from "@graphprotocol/graph-ts"
+import { BigInt, ethereum, log } from '@graphprotocol/graph-ts'
 import {
   GoodDollar,
   MinterAdded,
@@ -10,9 +10,9 @@ import {
   OwnershipTransferred,
   Transfer,
   Approval,
-  Transfer1
-} from "../generated/GoodDollar/GoodDollar"
-import { ExampleEntity } from "../generated/schema"
+  Transfer1,
+} from '../generated/GoodDollar/GoodDollar'
+import { TotalSupplyHistory, GoodDollarToken } from '../generated/schema'
 
 export function handleMinterAdded(event: MinterAdded): void {
   // Entities can be loaded from the store using a string ID; this ID
@@ -90,7 +90,41 @@ export function handlePauserRemoved(event: PauserRemoved): void {}
 
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
 
-export function handleTransfer(event: Transfer): void {}
+export function handleTransfer(event: Transfer): void {
+  let tokenContract = GoodDollar.bind(event.address)
+  let token: GoodDollarToken = GoodDollarToken.load('GoodDollar')
+  let blockDay = new Date(event.block.timestamp * 1000).toISOString().slice(0, 10)
+  let dayTimestamp = new Date(blockDay).valueOf()
+
+  if (token == null) {
+    token = new GoodDollarToken('GoodDollar')
+  }
+
+  token.totalSupply = tokenContract.totalSupply()
+
+  log.debug('event {} - token totalSupply at block {}: {}', [
+    event.transaction.hash,
+    event.block.number,
+    token.totalSupply,
+  ])
+
+  let lastSupplyUpdateId = token.totalSupplyHistory[0]
+
+  let updateHistory = true
+
+  if (lastSupplyUpdateId != null) {
+    let lastTimestamp = new Date(lastSupplyUpdateId).valueOf()
+    if (dayTimestamp - lastTimestamp < 1000 * 60 * 60 * 24) updateHistory = false
+  }
+
+  if (updateHistory) {
+    let supplyHistory = new TotalSupplyHistory(blockDay)
+    supplyHistory.totalSupply = token.totalSupply
+    supplyHistory.timestamp = dayTimestamp
+    supplyHistory.save()
+  }
+  token.save()
+}
 
 export function handleApproval(event: Approval): void {}
 
