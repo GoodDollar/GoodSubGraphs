@@ -1,0 +1,16 @@
+type DailyUBI @entity {
+  id: ID!
+  pool: BigInt!
+  quota: BigInt!
+  activeUsers: BigInt!
+  timestamp: BigInt!
+}
+
+type Citizen @entity {
+  id: ID!
+  balance: BigInt!
+  inTransfersCount: BigInt!
+  outTransfersCount: BigInt!
+  inTransfersTotal: BigInt!
+  outTransfersTotal: BigInt!
+}
