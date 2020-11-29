@@ -42,13 +42,13 @@ export class TotalSupplyHistory extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get timestamp(): BigInt {
-    let value = this.get("timestamp");
+  get blockTimestamp(): BigInt {
+    let value = this.get("blockTimestamp");
     return value.toBigInt();
   }
 
-  set timestamp(value: BigInt) {
-    this.set("timestamp", Value.fromBigInt(value));
+  set blockTimestamp(value: BigInt) {
+    this.set("blockTimestamp", Value.fromBigInt(value));
   }
 
   get totalSupply(): BigInt {

@@ -1,13 +1,16 @@
 specVersion: 0.0.2
+description: GoodDollar Statistics
+repository: https://github.com/GoodDollar/GoodSubGraphs
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: GoodDollar
     network: mainnet
     source:
-      address: '0x67C5870b4A41D4Ebef24d2456547A03F1f3e094B'
+      address: "0x67C5870b4A41D4Ebef24d2456547A03F1f3e094B"
       abi: GoodDollar
+      startBlock: 10591792
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -25,7 +28,7 @@ dataSources:
         - Transfer1
       abis:
         - name: GoodDollar
-          file: ./abis/GoodDollar.json
+          file: GoodDollar/abis/GoodDollar.json
       eventHandlers:
         - event: MinterAdded(indexed address)
           handler: handleMinterAdded
@@ -47,4 +50,4 @@ dataSources:
           handler: handleApproval
         - event: Transfer(indexed address,indexed address,uint256,bytes)
           handler: handleTransfer1
-      file: ./src/mapping.ts
+      file: GoodDollar/GoodDollar.wasm

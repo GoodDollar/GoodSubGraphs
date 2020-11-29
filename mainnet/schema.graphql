@@ -1,6 +1,6 @@
 type TotalSupplyHistory @entity {
   id: ID!
-  timestamp: BigInt!
+  blockTimestamp: BigInt!
   totalSupply: BigInt!
   goodDollar: GoodDollarToken!
 }
