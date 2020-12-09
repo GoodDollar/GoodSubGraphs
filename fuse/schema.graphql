@@ -14,3 +14,9 @@ type Citizen @entity {
   inTransfersTotal: BigInt!
   outTransfersTotal: BigInt!
 }
+
+type TransactionStatistics @entity {
+  id: ID!
+  transactionsCount: BigInt
+  transactionsValue: BigInt
+}

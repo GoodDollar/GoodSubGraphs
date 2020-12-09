@@ -78,3 +78,150 @@ export class DailyUBI extends Entity {
     this.set("timestamp", Value.fromBigInt(value));
   }
 }
+
+export class Citizen extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save Citizen entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save Citizen entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("Citizen", id.toString(), this);
+  }
+
+  static load(id: string): Citizen | null {
+    return store.get("Citizen", id) as Citizen | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get balance(): BigInt {
+    let value = this.get("balance");
+    return value.toBigInt();
+  }
+
+  set balance(value: BigInt) {
+    this.set("balance", Value.fromBigInt(value));
+  }
+
+  get inTransfersCount(): BigInt {
+    let value = this.get("inTransfersCount");
+    return value.toBigInt();
+  }
+
+  set inTransfersCount(value: BigInt) {
+    this.set("inTransfersCount", Value.fromBigInt(value));
+  }
+
+  get outTransfersCount(): BigInt {
+    let value = this.get("outTransfersCount");
+    return value.toBigInt();
+  }
+
+  set outTransfersCount(value: BigInt) {
+    this.set("outTransfersCount", Value.fromBigInt(value));
+  }
+
+  get inTransfersTotal(): BigInt {
+    let value = this.get("inTransfersTotal");
+    return value.toBigInt();
+  }
+
+  set inTransfersTotal(value: BigInt) {
+    this.set("inTransfersTotal", Value.fromBigInt(value));
+  }
+
+  get outTransfersTotal(): BigInt {
+    let value = this.get("outTransfersTotal");
+    return value.toBigInt();
+  }
+
+  set outTransfersTotal(value: BigInt) {
+    this.set("outTransfersTotal", Value.fromBigInt(value));
+  }
+}
+
+export class TransactionStatistics extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(
+      id !== null,
+      "Cannot save TransactionStatistics entity without an ID"
+    );
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save TransactionStatistics entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("TransactionStatistics", id.toString(), this);
+  }
+
+  static load(id: string): TransactionStatistics | null {
+    return store.get(
+      "TransactionStatistics",
+      id
+    ) as TransactionStatistics | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get transactionsCount(): BigInt | null {
+    let value = this.get("transactionsCount");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set transactionsCount(value: BigInt | null) {
+    if (value === null) {
+      this.unset("transactionsCount");
+    } else {
+      this.set("transactionsCount", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get transactionsValue(): BigInt | null {
+    let value = this.get("transactionsValue");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set transactionsValue(value: BigInt | null) {
+    if (value === null) {
+      this.unset("transactionsValue");
+    } else {
+      this.set("transactionsValue", Value.fromBigInt(value as BigInt));
+    }
+  }
+}

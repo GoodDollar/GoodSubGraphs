@@ -70,7 +70,7 @@ dataSources:
         - Citizen
       abis:
         - name: GoodDollar
-          file: ./abis/GoodDollar.json
+          file: ./abis/gooddollar.abi
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
