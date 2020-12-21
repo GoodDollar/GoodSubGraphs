@@ -1,4 +1,4 @@
 node_modules
 .vscode
-fuse/build
-fuse/generated
+build
+generated

@@ -2,3 +2,5 @@
 fuse/docker/data
 fuse/build
 fuse/generated
+mainnet/build
+mainnet/generated
