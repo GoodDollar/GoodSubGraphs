@@ -46,6 +46,7 @@ function aggregateTransactionStatisticsFromTransfer(event: Transfer): void {
   let statistics = TransactionStatistics.load('txStatistics')
   if (statistics == null) {
     statistics = new TransactionStatistics('txStatistics')
+    statistics.totalInCirculation = ZERO
   }
 
 
@@ -62,10 +63,10 @@ function aggregateTransactionStatisticsFromTransfer(event: Transfer): void {
   }
 
   if (event.params.to.toHexString() == ZERO_ADDRESS) {
-    statistics.totalInCirculation = statistics.totalInCirculation <= ZERO ? ZERO : statistics.totalInCirculation.minus(event.params.value)
+    statistics.totalInCirculation = statistics.totalInCirculation.minus(event.params.value)
   }
   if (event.params.from.toHexString() == ZERO_ADDRESS) {
-    statistics.totalInCirculation = statistics.totalInCirculation <= ZERO ? ZERO : statistics.totalInCirculation
+    statistics.totalInCirculation = statistics.totalInCirculation.plus(event.params.value)
   }
   log.info('txStatistics count:{} countClean:{} value:{} valueClean:{}', [statistics.transactionsCount.toString(), statistics.transactionsCountClean.toString(), statistics.transactionsValue.toString(), statistics.transactionsValueClean.toString()])
 
