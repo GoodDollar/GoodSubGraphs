@@ -1,3 +1,4 @@
 .vscode
 fuse/docker/data
 fuse/build
+fuse/generated

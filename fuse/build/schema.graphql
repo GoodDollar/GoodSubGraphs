@@ -1,7 +1,0 @@
-type DailyUBI @entity {
-  id: ID!
-  pool: BigInt!
-  quota: BigInt!
-  activeUsers: BigInt!
-  timestamp: BigInt!
-}
