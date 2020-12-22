@@ -35,19 +35,32 @@ export function handlePauserAdded(event: PauserAdded): void { }
 export function handlePauserRemoved(event: PauserRemoved): void { }
 
 export function handleTransfer(event: Transfer): void {
-  aggregateTransactionStatisticsFromTransfer(event)
+
+  let statistics = TransactionStatistics.load('txStatistics')
+
+  if (statistics == null) {
+    statistics = new TransactionStatistics('txStatistics')
+  }
+
+  aggregateTransactionStatisticsFromTransfer(event, statistics)
+
+  let blockTimestamp = parseInt(event.block.timestamp.toString())
+  let dayTimestamp = blockTimestamp - (blockTimestamp % (60 * 60 * 24))
+  // remove .0 from string
+  const dayTimestampStr = dayTimestamp.toString().split('.')[0]
+  log.info('got timestamp {}', [dayTimestampStr])
+  let dailyStatistics = TransactionStatistics.load(dayTimestampStr)
+  if (dailyStatistics == null) {
+    dailyStatistics = new TransactionStatistics(dayTimestampStr)
+  }
+  aggregateTransactionStatisticsFromTransfer(event, dailyStatistics)
 }
 
 export function handleTransfer1(event: Transfer1): void { }
 
 export function handleUnpaused(event: Unpaused): void { }
 
-function aggregateTransactionStatisticsFromTransfer(event: Transfer): void {
-  let statistics = TransactionStatistics.load('txStatistics')
-  if (statistics == null) {
-    statistics = new TransactionStatistics('txStatistics')
-    statistics.totalInCirculation = ZERO
-  }
+function aggregateTransactionStatisticsFromTransfer(event: Transfer, statistics: TransactionStatistics | null): void {
 
 
   statistics.transactionsCount = statistics.transactionsCount.plus(BigInt.fromI32(1))

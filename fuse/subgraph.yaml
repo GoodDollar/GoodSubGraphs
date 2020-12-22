@@ -68,6 +68,8 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Citizen
+        - TransactionStatistics
+        - Transfer
       abis:
         - name: GoodDollar
           file: ./abis/gooddollar.abi
