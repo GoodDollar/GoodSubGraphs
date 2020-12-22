@@ -81,7 +81,8 @@ function aggregateTransactionStatisticsFromTransfer(event: Transfer, statistics:
   if (event.params.from.toHexString() == ZERO_ADDRESS) {
     statistics.totalInCirculation = statistics.totalInCirculation.plus(event.params.value)
   }
-  log.info('txStatistics count:{} countClean:{} value:{} valueClean:{}', [statistics.transactionsCount.toString(), statistics.transactionsCountClean.toString(), statistics.transactionsValue.toString(), statistics.transactionsValueClean.toString()])
+
+  log.info('txStatistics count:{} countClean:{} value:{} valueClean:{}, totalInCirculation:{}', [statistics.transactionsCount.toString(), statistics.transactionsCountClean.toString(), statistics.transactionsValue.toString(), statistics.transactionsValueClean.toString(), statistics.totalInCirculation.toString()])
 
   statistics.save()
 }
