@@ -10,12 +10,18 @@ type Citizen @entity {
   id: ID!
   balance: BigInt!
   inTransactions: BigInt!
+  inTransactionsClean: BigInt!
   inTransactionsValue: BigInt!
+  inTransactionsValueClean: BigInt!
   outTransactions: BigInt!
+  outTransactionsClean: BigInt!
   outTransactionsValue: BigInt!
-  totalTransactionsValueClean: BigInt!
-  totalTransactions: BigInt!
-  lastClaimed: BigInt
+  outTransactionsValueClean: BigInt!
+  totalTransactions: BigInt
+  totalTransactionsClean: BigInt
+  totalTransactionsValue: BigInt
+  totalTransactionsValueClean: BigInt
+  lastClaimed: Int
   totalClaimedCount: BigInt
   claimStreak: BigInt
   longestClaimStreak: BigInt
