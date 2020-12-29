@@ -110,8 +110,9 @@ function aggregateCitizenFromTransfer(event: Transfer): void {
       citizenFrom.totalTransactionsValueClean = ZERO
       citizenFrom.totalTransactions = ZERO
       citizenFrom.totalTransactionsValue = ZERO
-      citizenFrom.totalTransactionsValueClean = ZERO
+      citizenFrom.claimStreak = ZERO
     }
+
     citizenFrom.outTransactions = citizenFrom.outTransactions.plus(BigInt.fromI32(1))
     citizenFrom.outTransactionsValue = citizenFrom.outTransactionsValue.plus(event.params.value)
     citizenFrom.balance = citizenFrom.balance.minus(event.params.value)
@@ -128,15 +129,15 @@ function aggregateCitizenFromTransfer(event: Transfer): void {
 
     citizenFrom.save()
 
-    // TODO: this log msg is causing a major error, fix it
-    // log.info('aggregateCitizenFromTransfer id {}, inTransactions {}, outTransactions {}, inTransactionsValue{}, outTransactionValue {}, balance {}',
-    //   [
-    //     citizenFrom.inTransactions.toString(),
-    //     citizenFrom.outTransactions.toString(),
-    //     citizenFrom.inTransactionsValue.toString(),
-    //     citizenFrom.outTransactionsValue.toString(),
-    //     citizenFrom.balance.toString()
-    //   ])
+    log.info('aggregateCitizenFromTransfer id {}, inTransactions {}, outTransactions {}, inTransactionsValue{}, outTransactionValue {}, balance {}',
+      [
+        citizenFrom.id.toString(),
+        citizenFrom.inTransactions.toString(),
+        citizenFrom.outTransactions.toString(),
+        citizenFrom.inTransactionsValue.toString(),
+        citizenFrom.outTransactionsValue.toString(),
+        citizenFrom.balance.toString()
+      ])
   }
 
   if (event.params.to.toHexString() != ZERO_ADDRESS) {
@@ -156,6 +157,7 @@ function aggregateCitizenFromTransfer(event: Transfer): void {
       citizenTo.totalTransactions = ZERO
       citizenTo.totalTransactionsValue = ZERO
       citizenTo.totalTransactionsValueClean = ZERO
+      citizenTo.claimStreak = ZERO
     }
 
     citizenTo.inTransactions = citizenTo.inTransactions.plus(BigInt.fromI32(1))
@@ -173,14 +175,14 @@ function aggregateCitizenFromTransfer(event: Transfer): void {
 
     citizenTo.save()
 
-    // TODO: this log msg is causing a major error, fix it
-    // log.info('aggregateCitizenFromTransfer id {}, inTransactions {}, outTransactions {}, inTransactionsValue{}, outTransactionValue {}, balance {}',
-    //   [
-    //     citizenTo.inTransactions.toString(),
-    //     citizenTo.outTransactions.toString(),
-    //     citizenTo.inTransactionsValue.toString(),
-    //     citizenTo.outTransactionsValue.toString(),
-    //     citizenTo.balance.toString()
-    //   ])
+    log.info('aggregateCitizenToTransfer id {}, inTransactions {}, outTransactions {}, inTransactionsValue{}, outTransactionValue {}, balance {}',
+      [
+        citizenTo.id.toString(),
+        citizenTo.inTransactions.toString(),
+        citizenTo.outTransactions.toString(),
+        citizenTo.inTransactionsValue.toString(),
+        citizenTo.outTransactionsValue.toString(),
+        citizenTo.balance.toString()
+      ])
   }
 }
