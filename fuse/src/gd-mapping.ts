@@ -12,7 +12,7 @@ import {
   Transfer1,
   Unpaused,
 } from '../generated/GoodDollar/GoodDollar'
-import { TransactionStatistics, Citizen } from '../generated/schema'
+import { Statistics, TransactionStatistics, Citizen } from '../generated/schema'
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 let ZERO = BigInt.fromI32(0)
@@ -36,13 +36,21 @@ export function handlePauserRemoved(event: PauserRemoved): void { }
 
 export function handleTransfer(event: Transfer): void {
 
-  let statistics = TransactionStatistics.load('txStatistics')
+  let txStatistics = TransactionStatistics.load('txStatistics')
 
-  if (statistics == null) {
-    statistics = new TransactionStatistics('txStatistics')
+  if (txStatistics == null) {
+    txStatistics = new TransactionStatistics('txStatistics')
   }
 
-  aggregateTransactionStatisticsFromTransfer(event, statistics)
+  aggregateTransactionStatisticsFromTransfer(event, txStatistics)
+
+  let statistics = Statistics.load('statistics')
+  if (statistics == null) {
+    statistics = new Statistics('statistics')
+  }
+
+  statistics.transactionStatistics = txStatistics.id
+  statistics.save()
 
   let blockTimestamp = parseInt(event.block.timestamp.toString())
   let dayTimestamp = blockTimestamp - (blockTimestamp % (60 * 60 * 24))
