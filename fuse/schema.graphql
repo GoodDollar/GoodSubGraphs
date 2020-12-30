@@ -35,3 +35,8 @@ type TransactionStatistics @entity {
   transactionsValueClean: BigInt
   totalInCirculation: BigInt
 }
+
+type Statistics @entity {
+  id: ID!
+  transactionStatistics: TransactionStatistics
+}
