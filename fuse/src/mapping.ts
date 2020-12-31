@@ -125,8 +125,6 @@ export function handleUBIClaimed(event: UBIClaimed): void {
   log.info('handleUBIClaimed claimer start {}', [event.params.claimer.toHexString()])
   let citizen = Citizen.load(event.params.claimer.toHex())
 
-  let now = event.block.timestamp
-
   if (citizen == null) {
     citizen = new Citizen(event.params.claimer.toHex())
   }
@@ -134,40 +132,9 @@ export function handleUBIClaimed(event: UBIClaimed): void {
   let isUniqueClaimer = false
   if (citizen.lastClaimed == null) {
     isUniqueClaimer = true
-    citizen.lastClaimed = now
   }
 
-  if (citizen.claimStreak == null) {
-    citizen.claimStreak = BigInt.fromI32(1)
-  }
-
-  if (citizen.longestClaimStreak == null) {
-    citizen.longestClaimStreak = BigInt.fromI32(1)
-  }
-
-  let yesterday = now.minus(BigInt.fromI32(24 * 60 * 60))
-
-  log.info('handleUBIClaimed claimer {}, citizen.claimStreak {}, citizen.longestClaimStreak {}',
-    [
-      event.params.claimer.toHexString(),
-      citizen.claimStreak.toString(),
-      citizen.longestClaimStreak.toString()
-    ])
-
-  if (citizen.lastClaimed.ge(yesterday)) {
-    citizen.claimStreak = citizen.claimStreak.plus(BigInt.fromI32(1))
-  } else {
-    citizen.claimStreak = BigInt.fromI32(1)
-  }
-
-  if (citizen.longestClaimStreak.lt(citizen.claimStreak)) {
-    citizen.longestClaimStreak = citizen.claimStreak
-  }
-
-  citizen.totalClaimedCount = citizen.totalClaimedCount.plus(BigInt.fromI32(1))
-  citizen.totalClaimedValue = citizen.totalClaimedValue.plus(event.params.amount)
-
-  citizen.save()
+  aggregateCitizenFromUBIClaimed(event, citizen)
 
   let statistics = Statistics.load('statistics')
   if (statistics == null) {
@@ -269,3 +236,44 @@ export function handleWhitelistedRemoved(event: WhitelistedRemoved): void {
   citizen.save()
 }
 
+function aggregateCitizenFromUBIClaimed(event: UBIClaimed, citizen: Citizen | null): void {
+
+  let now = event.block.timestamp
+
+  if (citizen.lastClaimed == null) {
+    citizen.lastClaimed = now
+  }
+
+  if (citizen.claimStreak == null) {
+    citizen.claimStreak = BigInt.fromI32(1)
+  }
+
+  if (citizen.longestClaimStreak == null) {
+    citizen.longestClaimStreak = BigInt.fromI32(1)
+  }
+
+  let yesterday = now.minus(BigInt.fromI32(24 * 60 * 60))
+
+  log.info('handleUBIClaimed claimer {}, citizen.claimStreak {}, citizen.longestClaimStreak {}',
+    [
+      event.params.claimer.toHexString(),
+      citizen.claimStreak.toString(),
+      citizen.longestClaimStreak.toString()
+    ])
+
+  if (citizen.lastClaimed.ge(yesterday)) {
+    citizen.claimStreak = citizen.claimStreak.plus(BigInt.fromI32(1))
+  } else {
+    citizen.claimStreak = BigInt.fromI32(1)
+  }
+
+  if (citizen.longestClaimStreak.lt(citizen.claimStreak)) {
+    citizen.longestClaimStreak = citizen.claimStreak
+  }
+
+  citizen.totalClaimedCount = citizen.totalClaimedCount.plus(BigInt.fromI32(1))
+  citizen.totalClaimedValue = citizen.totalClaimedValue.plus(event.params.amount)
+
+  citizen.save()
+
+}
