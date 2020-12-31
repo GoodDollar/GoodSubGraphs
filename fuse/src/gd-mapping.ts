@@ -102,7 +102,7 @@ function aggregateCitizenFromTransfer(event: Transfer): void {
 
   log.info('event.params.from {}, event.params.to {}, event.params.value {}', [event.params.from.toHex(), event.params.to.toHex(), event.params.value.toString()])
 
-  if (event.params.from.toHexString() != ZERO_ADDRESS) {
+  if (!contracts.includes(event.params.from.toHexString())) {
     let citizenFrom = Citizen.load(event.params.from.toHex())
     if (citizenFrom == null) {
       citizenFrom = new Citizen(event.params.from.toHexString())
@@ -148,7 +148,7 @@ function aggregateCitizenFromTransfer(event: Transfer): void {
       ])
   }
 
-  if (event.params.to.toHexString() != ZERO_ADDRESS) {
+  if (!contracts.includes(event.params.to.toHexString())) {
     let citizenTo = Citizen.load(event.params.to.toHexString())
     if (citizenTo == null) {
       citizenTo = new Citizen(event.params.to.toHexString())
