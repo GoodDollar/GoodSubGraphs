@@ -109,7 +109,11 @@ export function handleUBICalculated(event: UBICalculated): void {
     quota.toString(),
     pool.toString(),
   ])
-  let dailyUbi = new DailyUBI(event.params.day.toString())
+
+  let dailyUbi = DailyUBI.load(event.params.day.toString())
+  if (dailyUbi == null) {
+    dailyUbi = new DailyUBI(event.params.day.toString())
+  }
   dailyUbi.pool = pool
   dailyUbi.quota = quota
   dailyUbi.activeUsers = activeUsers
@@ -163,7 +167,6 @@ export function handleUBIClaimed(event: UBIClaimed): void {
   citizen.totalClaimedCount = citizen.totalClaimedCount.plus(BigInt.fromI32(1))
   citizen.totalClaimedValue = citizen.totalClaimedValue.plus(event.params.amount)
 
-  citizen.lastClaimed = now
   citizen.save()
 
   let statistics = Statistics.load('statistics')
@@ -193,6 +196,32 @@ export function handleUBIClaimed(event: UBIClaimed): void {
   }
 
   statistics.save()
+
+  let ubiScheme = UBIScheme.bind(event.address)
+  let currentDay = ubiScheme.currentDay()
+  log.info('currentDay {}', [currentDay.toString()])
+  let dailyUbi = DailyUBI.load(currentDay.toString())
+  if (dailyUbi == null) {
+    dailyUbi = new DailyUBI(currentDay.toString())
+  }
+
+  if (dailyUbi.totalUBIDistributed == null) {
+    dailyUbi.totalUBIDistributed = event.params.amount
+  } else {
+    dailyUbi.totalUBIDistributed = dailyUbi.totalUBIDistributed.plus(event.params.amount)
+  }
+
+  if (dailyUbi.totalClaims == null) {
+    dailyUbi.totalClaims = BigInt.fromI32(1)
+  } else {
+    dailyUbi.totalClaims = dailyUbi.totalClaims.plus(BigInt.fromI32(1))
+  }
+
+  dailyUbi.uniqueClaimers = statistics.uniqueClaimers
+
+  log.info('handleUBIClaimed dailyUbi.id {}, dailyUbi.totalUBIDistributed {}', [dailyUbi.id.toString(), dailyUbi.totalUBIDistributed.toString()])
+
+  dailyUbi.save()
 
 }
 
