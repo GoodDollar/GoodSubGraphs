@@ -151,23 +151,7 @@ export function handleUBIClaimed(event: UBIClaimed): void {
     dailyUbi = new DailyUBI(currentDay.toString())
   }
 
-  if (dailyUbi.totalUBIDistributed == null) {
-    dailyUbi.totalUBIDistributed = event.params.amount
-  } else {
-    dailyUbi.totalUBIDistributed = dailyUbi.totalUBIDistributed.plus(event.params.amount)
-  }
-
-  if (dailyUbi.totalClaims == null) {
-    dailyUbi.totalClaims = BigInt.fromI32(1)
-  } else {
-    dailyUbi.totalClaims = dailyUbi.totalClaims.plus(BigInt.fromI32(1))
-  }
-
-  dailyUbi.uniqueClaimers = statistics.uniqueClaimers
-
-  log.info('handleUBIClaimed dailyUbi.id {}, dailyUbi.totalUBIDistributed {}', [dailyUbi.id.toString(), dailyUbi.totalUBIDistributed.toString()])
-
-  dailyUbi.save()
+  aggregateDailyUbiFromUBIClaimed(event, dailyUbi)
 
 }
 
@@ -213,6 +197,28 @@ export function handleWhitelistedRemoved(event: WhitelistedRemoved): void {
   citizen.isCitizen = false
 
   citizen.save()
+}
+
+function aggregateDailyUbiFromUBIClaimed(event: UBIClaimed, dailyUbi: DailyUBI | null): void {
+  if (dailyUbi.totalUBIDistributed == null) {
+    dailyUbi.totalUBIDistributed = event.params.amount
+  } else {
+    dailyUbi.totalUBIDistributed = dailyUbi.totalUBIDistributed.plus(event.params.amount)
+  }
+
+  if (dailyUbi.totalClaims == null) {
+    dailyUbi.totalClaims = BigInt.fromI32(1)
+  } else {
+    dailyUbi.totalClaims = dailyUbi.totalClaims.plus(BigInt.fromI32(1))
+  }
+
+  let statistics = Statistics.load('statistics')
+
+  dailyUbi.uniqueClaimers = statistics.uniqueClaimers
+
+  log.info('handleUBIClaimed dailyUbi.id {}, dailyUbi.totalUBIDistributed {}', [dailyUbi.id.toString(), dailyUbi.totalUBIDistributed.toString()])
+
+  dailyUbi.save()
 }
 
 function aggregateStatisticsFromUBIClaimed(event: UBIClaimed, statistics: Statistics | null, isUniqueClaimer: boolean): void {
