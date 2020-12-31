@@ -17,7 +17,7 @@ import {
 
 import { WhitelistedAdded, WhitelistedRemoved } from '../generated/Identity/Identity'
 
-import { DailyUBI, Citizen } from '../generated/schema'
+import { DailyUBI, Citizen, Statistics } from '../generated/schema'
 
 export function handleActivatedUser(event: ActivatedUser): void {
   // // Entities can be loaded from the store using a string ID; this ID
@@ -127,7 +127,9 @@ export function handleUBIClaimed(event: UBIClaimed): void {
     citizen = new Citizen(event.params.claimer.toHex())
   }
 
+  let isUniqueClaimer = false
   if (citizen.lastClaimed == null) {
+    isUniqueClaimer = true
     citizen.lastClaimed = now
   }
 
@@ -163,6 +165,35 @@ export function handleUBIClaimed(event: UBIClaimed): void {
 
   citizen.lastClaimed = now
   citizen.save()
+
+  let statistics = Statistics.load('statistics')
+  if (statistics == null) {
+    statistics = new Statistics('statistics')
+  }
+
+  if (statistics.totalUBIDistributed == null) {
+    statistics.totalUBIDistributed = event.params.amount
+  } else {
+    statistics.totalUBIDistributed = statistics.totalUBIDistributed.plus(event.params.amount)
+  }
+
+  if (isUniqueClaimer == true) {
+    if (statistics.uniqueClaimers == null) {
+      statistics.uniqueClaimers = BigInt.fromI32(1)
+    } else {
+      statistics.uniqueClaimers = statistics.uniqueClaimers.plus(BigInt.fromI32(1))
+    }
+
+  }
+
+  if (statistics.totalClaims == null) {
+    statistics.totalClaims = BigInt.fromI32(1)
+  } else {
+    statistics.totalClaims = statistics.totalClaims.plus(BigInt.fromI32(1))
+  }
+
+  statistics.save()
+
 }
 
 export function handleUBICycleCalculated(event: UBICycleCalculated): void { }

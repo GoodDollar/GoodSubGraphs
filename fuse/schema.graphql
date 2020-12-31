@@ -42,4 +42,7 @@ type TransactionStatistics @entity {
 type Statistics @entity {
   id: ID!
   transactionStatistics: TransactionStatistics
+  totalUBIDistributed: BigInt
+  uniqueClaimers: BigInt
+  totalClaims: BigInt
 }
