@@ -201,9 +201,6 @@ export function handleWhitelistedRemoved(event: WhitelistedRemoved): void {
     citizen = new Citizen(event.params.account.toHex())
   }
 
-  // TODO: should claim streak be reset to zero when removing citizen?
-  citizen.claimStreak = BigInt.fromI32(0)
-
   citizen.isCitizen = false
 
   citizen.save()
