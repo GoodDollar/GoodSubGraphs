@@ -47,10 +47,10 @@ export function handleTransfer(event: Transfer): void {
   let statistics = Statistics.load('statistics')
   if (statistics == null) {
     statistics = new Statistics('statistics')
+    statistics.transactionStatistics = txStatistics.id
+    statistics.save()
   }
 
-  statistics.transactionStatistics = txStatistics.id
-  statistics.save()
 
   let blockTimestamp = parseInt(event.block.timestamp.toString())
   let dayTimestamp = blockTimestamp - (blockTimestamp % (60 * 60 * 24))
