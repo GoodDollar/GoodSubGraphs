@@ -151,6 +151,10 @@ export function handleUBIClaimed(event: UBIClaimed): void {
     dailyUbi = new DailyUBI(currentDay.toString())
   }
 
+  log.info('statistics.uniqueClaimers {}', [statistics.uniqueClaimers.toString()])
+
+  dailyUbi.uniqueClaimers = statistics.uniqueClaimers
+
   aggregateDailyUbiFromUBIClaimed(event, dailyUbi)
 
 }
@@ -207,10 +211,6 @@ function aggregateDailyUbiFromUBIClaimed(event: UBIClaimed, dailyUbi: DailyUBI |
   } else {
     dailyUbi.totalClaims = dailyUbi.totalClaims.plus(BigInt.fromI32(1))
   }
-
-  let statistics = Statistics.load('statistics')
-
-  dailyUbi.uniqueClaimers = statistics.uniqueClaimers
 
   log.info('handleUBIClaimed dailyUbi.id {}, dailyUbi.totalUBIDistributed {}', [dailyUbi.id.toString(), dailyUbi.totalUBIDistributed.toString()])
 
