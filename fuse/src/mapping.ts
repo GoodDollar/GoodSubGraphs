@@ -179,8 +179,7 @@ export function handleWhitelistedAdded(event: WhitelistedAdded): void {
 
   if (citizen == null) {
     citizen = new Citizen(event.params.account.toHex())
-    citizen.claimStreak = BigInt.fromI32(1)
-    citizen.longestClaimStreak = BigInt.fromI32(1)
+    citizen.claimStreak = BigInt.fromI32(0)
   }
 
   if (citizen.dateJoined == null) {
