@@ -99,7 +99,13 @@ export function handleSchemeStarted(event: SchemeStarted): void { }
 export function handleTotalFished(event: TotalFished): void { }
 
 export function handleUBICalculated(event: UBICalculated): void {
-  log.info('got ubicalculated event {}', [event.params.day.toHex()])
+  log.info('handleUBICalculated event.params.day {}, event.params.dailyUbi {}, event.params.blockNumber {}',
+    [
+      event.params.day.toString(),
+      event.params.dailyUbi.toString(),
+      event.params.blockNumber.toString()
+    ])
+
   let ubiScheme = UBIScheme.bind(event.address)
   let activeUsers = ubiScheme.activeUsersCount()
   let quota = event.params.dailyUbi
