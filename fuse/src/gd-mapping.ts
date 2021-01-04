@@ -72,6 +72,7 @@ export function handleUnpaused(event: Unpaused): void { }
 
 function aggregateTransactionStatisticsFromTransfer(event: Transfer, statistics: TransactionStatistics | null): void {
 
+  log.info('aggregateTransactionStatisticsFromTransfer event.params.from {}, event.params.to {}, event.params.value {}', [event.params.from.toHex(), event.params.to.toHex(), event.params.value.toString()])
 
   statistics.transactionsCount = statistics.transactionsCount.plus(BigInt.fromI32(1))
   statistics.transactionsValue = event.params.value.plus(statistics.transactionsValue as BigInt)
@@ -98,99 +99,96 @@ function aggregateTransactionStatisticsFromTransfer(event: Transfer, statistics:
 
 }
 
+
 function aggregateCitizenFromTransfer(event: Transfer): void {
 
-  log.info('event.params.from {}, event.params.to {}, event.params.value {}', [event.params.from.toHex(), event.params.to.toHex(), event.params.value.toString()])
+  log.info('aggregateCitizenFromTransfer event.params.from {}, event.params.to {}, event.params.value {}', [event.params.from.toHex(), event.params.to.toHex(), event.params.value.toString()])
 
-  if (!contracts.includes(event.params.from.toHexString())) {
-    let citizenFrom = Citizen.load(event.params.from.toHex())
-    if (citizenFrom == null) {
-      citizenFrom = new Citizen(event.params.from.toHexString())
-      citizenFrom.outTransactions = ZERO
-      citizenFrom.outTransactionsClean = ZERO
-      citizenFrom.outTransactionsValue = ZERO
-      citizenFrom.outTransactionsValueClean = ZERO
-      citizenFrom.inTransactions = ZERO
-      citizenFrom.inTransactionsClean = ZERO
-      citizenFrom.inTransactionsValue = ZERO
-      citizenFrom.inTransactionsValueClean = ZERO
-      citizenFrom.balance = ZERO
-      citizenFrom.totalTransactionsValueClean = ZERO
-      citizenFrom.totalTransactions = ZERO
-      citizenFrom.totalTransactionsValue = ZERO
-      citizenFrom.claimStreak = ZERO
-    }
-
-    citizenFrom.outTransactions = citizenFrom.outTransactions.plus(BigInt.fromI32(1))
-    citizenFrom.outTransactionsValue = citizenFrom.outTransactionsValue.plus(event.params.value)
-    citizenFrom.balance = citizenFrom.balance.minus(event.params.value)
-    citizenFrom.totalTransactions = citizenFrom.totalTransactions.plus(BigInt.fromI32(1))
-    citizenFrom.totalTransactionsValue = citizenFrom.totalTransactionsValue.plus(event.params.value)
-
-    if (!contracts.includes(event.params.to.toHexString()) && !contracts.includes(event.params.from.toHexString())) {
-      citizenFrom.outTransactionsClean = citizenFrom.outTransactionsClean.plus(BigInt.fromI32(1))
-      citizenFrom.outTransactionsValueClean = citizenFrom.outTransactionsValueClean.plus(event.params.value)
-      citizenFrom.totalTransactionsClean = citizenFrom.totalTransactionsClean.plus(BigInt.fromI32(1))
-      citizenFrom.totalTransactionsValueClean = citizenFrom.totalTransactionsValueClean.plus(event.params.value)
-    }
-
-
-    citizenFrom.save()
-
-    log.info('aggregateCitizenFromTransfer id {}, inTransactions {}, outTransactions {}, inTransactionsValue{}, outTransactionValue {}, balance {}',
-      [
-        citizenFrom.id.toString(),
-        citizenFrom.inTransactions.toString(),
-        citizenFrom.outTransactions.toString(),
-        citizenFrom.inTransactionsValue.toString(),
-        citizenFrom.outTransactionsValue.toString(),
-        citizenFrom.balance.toString()
-      ])
+  let citizenFrom = Citizen.load(event.params.from.toHex())
+  if (citizenFrom == null) {
+    citizenFrom = new Citizen(event.params.from.toHexString())
+    citizenFrom.outTransactions = ZERO
+    citizenFrom.outTransactionsClean = ZERO
+    citizenFrom.outTransactionsValue = ZERO
+    citizenFrom.outTransactionsValueClean = ZERO
+    citizenFrom.inTransactions = ZERO
+    citizenFrom.inTransactionsClean = ZERO
+    citizenFrom.inTransactionsValue = ZERO
+    citizenFrom.inTransactionsValueClean = ZERO
+    citizenFrom.balance = ZERO
+    citizenFrom.totalTransactionsValueClean = ZERO
+    citizenFrom.totalTransactions = ZERO
+    citizenFrom.totalTransactionsValue = ZERO
+    citizenFrom.claimStreak = ZERO
   }
 
-  if (!contracts.includes(event.params.to.toHexString())) {
-    let citizenTo = Citizen.load(event.params.to.toHexString())
-    if (citizenTo == null) {
-      citizenTo = new Citizen(event.params.to.toHexString())
-      citizenTo.outTransactions = ZERO
-      citizenTo.outTransactionsClean = ZERO
-      citizenTo.outTransactionsValue = ZERO
-      citizenTo.outTransactionsValueClean = ZERO
-      citizenTo.inTransactions = ZERO
-      citizenTo.inTransactionsClean = ZERO
-      citizenTo.inTransactionsValue = ZERO
-      citizenTo.inTransactionsValueClean = ZERO
-      citizenTo.balance = ZERO
-      citizenTo.totalTransactionsValueClean = ZERO
-      citizenTo.totalTransactions = ZERO
-      citizenTo.totalTransactionsValue = ZERO
-      citizenTo.totalTransactionsValueClean = ZERO
-      citizenTo.claimStreak = ZERO
-    }
+  citizenFrom.outTransactions = citizenFrom.outTransactions.plus(BigInt.fromI32(1))
+  citizenFrom.outTransactionsValue = citizenFrom.outTransactionsValue.plus(event.params.value)
+  citizenFrom.balance = citizenFrom.balance.minus(event.params.value)
+  citizenFrom.totalTransactions = citizenFrom.totalTransactions.plus(BigInt.fromI32(1))
+  citizenFrom.totalTransactionsValue = citizenFrom.totalTransactionsValue.plus(event.params.value)
 
-    citizenTo.inTransactions = citizenTo.inTransactions.plus(BigInt.fromI32(1))
-    citizenTo.inTransactionsValue = citizenTo.inTransactionsValue.plus(event.params.value)
-    citizenTo.balance = citizenTo.balance.plus(event.params.value)
-    citizenTo.totalTransactions = citizenTo.totalTransactions.plus(BigInt.fromI32(1))
-    citizenTo.totalTransactionsValue = citizenTo.totalTransactionsValue.plus(event.params.value)
-
-    if (!contracts.includes(event.params.to.toHexString()) && !contracts.includes(event.params.from.toHexString())) {
-      citizenTo.inTransactionsClean = citizenTo.inTransactionsClean.plus(BigInt.fromI32(1))
-      citizenTo.inTransactionsValueClean = citizenTo.inTransactionsValueClean.plus(event.params.value)
-      citizenTo.totalTransactionsClean = citizenTo.totalTransactionsClean.plus(BigInt.fromI32(1))
-      citizenTo.totalTransactionsValueClean = citizenTo.totalTransactionsValueClean.plus(event.params.value)
-    }
-
-    citizenTo.save()
-
-    log.info('aggregateCitizenToTransfer id {}, inTransactions {}, outTransactions {}, inTransactionsValue{}, outTransactionValue {}, balance {}',
-      [
-        citizenTo.id.toString(),
-        citizenTo.inTransactions.toString(),
-        citizenTo.outTransactions.toString(),
-        citizenTo.inTransactionsValue.toString(),
-        citizenTo.outTransactionsValue.toString(),
-        citizenTo.balance.toString()
-      ])
+  if (!contracts.includes(event.params.to.toHexString()) && !contracts.includes(event.params.from.toHexString())) {
+    citizenFrom.outTransactionsClean = citizenFrom.outTransactionsClean.plus(BigInt.fromI32(1))
+    citizenFrom.outTransactionsValueClean = citizenFrom.outTransactionsValueClean.plus(event.params.value)
+    citizenFrom.totalTransactionsClean = citizenFrom.totalTransactionsClean.plus(BigInt.fromI32(1))
+    citizenFrom.totalTransactionsValueClean = citizenFrom.totalTransactionsValueClean.plus(event.params.value)
   }
+
+
+  citizenFrom.save()
+
+  log.info('aggregateCitizenFromTransfer id {}, inTransactions {}, outTransactions {}, inTransactionsValue{}, outTransactionValue {}, balance {}',
+    [
+      citizenFrom.id.toString(),
+      citizenFrom.inTransactions.toString(),
+      citizenFrom.outTransactions.toString(),
+      citizenFrom.inTransactionsValue.toString(),
+      citizenFrom.outTransactionsValue.toString(),
+      citizenFrom.balance.toString()
+    ])
+
+  let citizenTo = Citizen.load(event.params.to.toHexString())
+  if (citizenTo == null) {
+    citizenTo = new Citizen(event.params.to.toHexString())
+    citizenTo.outTransactions = ZERO
+    citizenTo.outTransactionsClean = ZERO
+    citizenTo.outTransactionsValue = ZERO
+    citizenTo.outTransactionsValueClean = ZERO
+    citizenTo.inTransactions = ZERO
+    citizenTo.inTransactionsClean = ZERO
+    citizenTo.inTransactionsValue = ZERO
+    citizenTo.inTransactionsValueClean = ZERO
+    citizenTo.balance = ZERO
+    citizenTo.totalTransactionsValueClean = ZERO
+    citizenTo.totalTransactions = ZERO
+    citizenTo.totalTransactionsValue = ZERO
+    citizenTo.totalTransactionsValueClean = ZERO
+    citizenTo.claimStreak = ZERO
+  }
+
+  citizenTo.inTransactions = citizenTo.inTransactions.plus(BigInt.fromI32(1))
+  citizenTo.inTransactionsValue = citizenTo.inTransactionsValue.plus(event.params.value)
+  citizenTo.balance = citizenTo.balance.plus(event.params.value)
+  citizenTo.totalTransactions = citizenTo.totalTransactions.plus(BigInt.fromI32(1))
+  citizenTo.totalTransactionsValue = citizenTo.totalTransactionsValue.plus(event.params.value)
+
+  if (!contracts.includes(event.params.to.toHexString()) && !contracts.includes(event.params.from.toHexString())) {
+    citizenTo.inTransactionsClean = citizenTo.inTransactionsClean.plus(BigInt.fromI32(1))
+    citizenTo.inTransactionsValueClean = citizenTo.inTransactionsValueClean.plus(event.params.value)
+    citizenTo.totalTransactionsClean = citizenTo.totalTransactionsClean.plus(BigInt.fromI32(1))
+    citizenTo.totalTransactionsValueClean = citizenTo.totalTransactionsValueClean.plus(event.params.value)
+  }
+
+  citizenTo.save()
+
+  log.info('aggregateCitizenToTransfer id {}, inTransactions {}, outTransactions {}, inTransactionsValue{}, outTransactionValue {}, balance {}',
+    [
+      citizenTo.id.toString(),
+      citizenTo.inTransactions.toString(),
+      citizenTo.outTransactions.toString(),
+      citizenTo.inTransactionsValue.toString(),
+      citizenTo.outTransactionsValue.toString(),
+      citizenTo.balance.toString()
+    ])
 }
