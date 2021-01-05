@@ -28,7 +28,7 @@ dataSources:
         - WithdrawFromDao
       abis:
         - name: UBIScheme
-          file: ./abis/UBIScheme.json
+          file: ./node_modules/@gooddollar/goodcontracts/stakingModel/build/contracts/UBIScheme.json
       eventHandlers:
         # - event: ActivatedUser(indexed address)
         #   handler: handleActivatedUser
@@ -68,10 +68,32 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Citizen
+        - TransactionStatistics
+        - Transfer
       abis:
         - name: GoodDollar
-          file: ./abis/gooddollar.abi
+          file: ./node_modules/@gooddollar/goodcontracts/build/contracts/GoodDollar.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
       file: ./src/gd-mapping.ts
+  - kind: ethereum/contract
+    name: OneTimePayments
+    network: mainnet
+    source:
+      address: '0xd9Aa86e0Ddb932bD78ab8c71C1B98F83cF610Bd4'
+      abi: OneTimePayments
+      startBlock: 6280000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Citizen
+      abis:
+        - name: OneTimePayments
+          file: ./node_modules/@gooddollar/goodcontracts/build/contracts/OneTimePayments.json
+      eventHandlers:
+        - event: PaymentWithdraw(indexed address,indexed address,indexed address,uint256)
+          handler: handlePaymentWithdraw
+      file: ./src/one-time-payment-mapping.ts
