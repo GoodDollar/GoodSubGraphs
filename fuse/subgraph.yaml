@@ -42,10 +42,10 @@ dataSources:
         #   handler: handleSchemeStarted
         # - event: TotalFished(uint256)
         #   handler: handleTotalFished
-        - event: UBICalculated(uint256,uint256,uint256)
-          handler: handleUBICalculated
-        # - event: UBIClaimed(indexed address,uint256)
-        #   handler: handleUBIClaimed
+        # - event: UBICalculated(uint256,uint256,uint256)
+          # handler: handleUBICalculated
+          - event: UBIClaimed(indexed address,uint256)
+            handler: handleUBIClaimed
         # - event: UBICycleCalculated(uint256,uint256,uint256,uint256)
         #   handler: handleUBICycleCalculated
         # - event: UBIEnded(uint256,uint256)
@@ -97,3 +97,25 @@ dataSources:
         - event: PaymentWithdraw(indexed address,indexed address,indexed address,uint256)
           handler: handlePaymentWithdraw
       file: ./src/one-time-payment-mapping.ts
+  - kind: ethereum/contract
+    name: Identity
+    network: mainnet
+    source:
+      address: '0xFa8d865A962ca8456dF331D78806152d3aC5B84F'
+      abi: Identity
+      startBlock: 6280000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Citizen
+      abis:
+        - name: Identity
+          file: ./node_modules/@gooddollar/goodcontracts/build/contracts/Identity.json
+      eventHandlers:
+        - event: WhitelistedAdded(indexed address)
+          handler: handleWhitelistedAdded
+        - event: WhitelistedRemoved(indexed address)
+          handler: handleWhitelistedRemoved
+      file: ./src/mapping.ts

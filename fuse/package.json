@@ -8,12 +8,16 @@
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ GoodDollar/GoodSubGraphsFuse",
     "create-local": "graph create --node http://localhost:8020/ GoodDollar/GoodSubGraphsFuse",
     "remove-local": "graph remove --node http://localhost:8020/ GoodDollar/GoodSubGraphsFuse",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 GoodDollar/GoodSubGraphsFuse"
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 GoodDollar/GoodSubGraphsFuse",
+    "dev": "npm run codegen && node_modules/nodemon/bin/nodemon.js --exec 'npm run deploy-local' --ignore build/ --ignore generated/ --watch 'src/**' --ext 'ts,json'"
   },
   "dependencies": {
     "@gooddollar/goodcontracts": "^2.2.5",
     "@graphprotocol/graph-cli": "^0.19.0",
     "@graphprotocol/graph-ts": "^0.19.0"
   },
-  "version": "0.0.0"
+  "version": "0.0.0",
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
 }

@@ -14,7 +14,10 @@ import {
   UBIStarted,
   WithdrawFromDao,
 } from '../generated/UBIScheme/UBIScheme'
-import { DailyUBI } from '../generated/schema'
+
+import { WhitelistedAdded, WhitelistedRemoved } from '../generated/Identity/Identity'
+
+import { DailyUBI, Citizen } from '../generated/schema'
 
 export function handleActivatedUser(event: ActivatedUser): void {
   // // Entities can be loaded from the store using a string ID; this ID
@@ -85,22 +88,28 @@ export function handleActivatedUser(event: ActivatedUser): void {
   // - contract.fishMulti(...)
 }
 
-export function handleInactiveUserFished(event: InactiveUserFished): void {}
+export function handleInactiveUserFished(event: InactiveUserFished): void { }
 
-export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
+export function handleOwnershipTransferred(event: OwnershipTransferred): void { }
 
-export function handleSchemeEnded(event: SchemeEnded): void {}
+export function handleSchemeEnded(event: SchemeEnded): void { }
 
-export function handleSchemeStarted(event: SchemeStarted): void {}
+export function handleSchemeStarted(event: SchemeStarted): void { }
 
-export function handleTotalFished(event: TotalFished): void {}
+export function handleTotalFished(event: TotalFished): void { }
 
 export function handleUBICalculated(event: UBICalculated): void {
-  log.info('got ubicalculated event {}', [event.params.day.toHex()])
+  log.info('handleUBICalculated event.params.day {}, event.params.dailyUbi {}, event.params.blockNumber {}',
+    [
+      event.params.day.toString(),
+      event.params.dailyUbi.toString(),
+      event.params.blockNumber.toString()
+    ])
+
   let ubiScheme = UBIScheme.bind(event.address)
   let activeUsers = ubiScheme.activeUsersCount()
   let quota = event.params.dailyUbi
-  let pool = activeUsers * quota
+  let pool = activeUsers.times(quota)
   log.info('dailyubi details: active: {} quota: {} pool: {}', [
     activeUsers.toString(),
     quota.toString(),
@@ -114,12 +123,91 @@ export function handleUBICalculated(event: UBICalculated): void {
   dailyUbi.save()
 }
 
-export function handleUBIClaimed(event: UBIClaimed): void {}
+export function handleUBIClaimed(event: UBIClaimed): void {
+  log.info('handleUBIClaimed claimer start {}', [event.params.claimer.toHexString()])
+  let citizen = Citizen.load(event.params.claimer.toHex())
 
-export function handleUBICycleCalculated(event: UBICycleCalculated): void {}
+  let now = event.block.timestamp
 
-export function handleUBIEnded(event: UBIEnded): void {}
+  if (citizen == null) {
+    citizen = new Citizen(event.params.claimer.toHex())
+  }
 
-export function handleUBIStarted(event: UBIStarted): void {}
+  if (citizen.lastClaimed == null) {
+    citizen.lastClaimed = now
+  }
 
-export function handleWithdrawFromDao(event: WithdrawFromDao): void {}
+  if (citizen.claimStreak == null) {
+    citizen.claimStreak = BigInt.fromI32(1)
+  }
+
+  if (citizen.longestClaimStreak == null) {
+    citizen.longestClaimStreak = BigInt.fromI32(1)
+  }
+
+  let yesterday = now.minus(BigInt.fromI32(24 * 60 * 60))
+
+  log.info('handleUBIClaimed claimer {}, citizen.claimStreak {}, citizen.longestClaimStreak {}',
+    [
+      event.params.claimer.toHexString(),
+      citizen.claimStreak.toString(),
+      citizen.longestClaimStreak.toString()
+    ])
+
+  if (citizen.lastClaimed.ge(yesterday)) {
+    citizen.claimStreak = citizen.claimStreak.plus(BigInt.fromI32(1))
+  } else {
+    citizen.claimStreak = BigInt.fromI32(1)
+  }
+
+  if (citizen.longestClaimStreak.lt(citizen.claimStreak)) {
+    citizen.longestClaimStreak = citizen.claimStreak
+  }
+
+  citizen.totalClaimedCount = citizen.totalClaimedCount.plus(BigInt.fromI32(1))
+  citizen.totalClaimedValue = citizen.totalClaimedValue.plus(event.params.amount)
+
+  citizen.lastClaimed = now
+  citizen.save()
+}
+
+export function handleUBICycleCalculated(event: UBICycleCalculated): void { }
+
+export function handleUBIEnded(event: UBIEnded): void { }
+
+export function handleUBIStarted(event: UBIStarted): void { }
+
+export function handleWithdrawFromDao(event: WithdrawFromDao): void { }
+
+export function handleWhitelistedAdded(event: WhitelistedAdded): void {
+  log.info('handleWhitelistedAdded event.params.account {}', [event.params.account.toHexString()])
+  let citizen = Citizen.load(event.params.account.toHex())
+
+  if (citizen == null) {
+    citizen = new Citizen(event.params.account.toHex())
+    citizen.claimStreak = BigInt.fromI32(0)
+  }
+
+  if (citizen.dateJoined == null) {
+    citizen.dateJoined = event.block.timestamp
+  }
+
+  citizen.isCitizen = true
+  log.info('handleWhitelistedAdded citizen.dateJoined {}', [citizen.dateJoined.toString()])
+
+  citizen.save()
+}
+
+export function handleWhitelistedRemoved(event: WhitelistedRemoved): void {
+  log.info('handleWhitelistedRemoved event.params.account {}', [event.params.account.toHex()])
+  let citizen = Citizen.load(event.params.account.toHex())
+
+  if (citizen == null) {
+    citizen = new Citizen(event.params.account.toHex())
+  }
+
+  citizen.isCitizen = false
+
+  citizen.save()
+}
+

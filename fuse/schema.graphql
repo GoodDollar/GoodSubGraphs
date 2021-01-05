@@ -8,23 +8,26 @@ type DailyUBI @entity {
 
 type Citizen @entity {
   id: ID!
-  balance: BigInt!
-  inTransactions: BigInt!
-  inTransactionsClean: BigInt!
-  inTransactionsValue: BigInt!
-  inTransactionsValueClean: BigInt!
-  outTransactions: BigInt!
-  outTransactionsClean: BigInt!
-  outTransactionsValue: BigInt!
-  outTransactionsValueClean: BigInt!
+  balance: BigInt
+  inTransactions: BigInt
+  inTransactionsClean: BigInt
+  inTransactionsValue: BigInt
+  inTransactionsValueClean: BigInt
+  outTransactions: BigInt
+  outTransactionsClean: BigInt
+  outTransactionsValue: BigInt
+  outTransactionsValueClean: BigInt
   totalTransactions: BigInt
   totalTransactionsClean: BigInt
   totalTransactionsValue: BigInt
   totalTransactionsValueClean: BigInt
-  lastClaimed: Int
+  lastClaimed: BigInt
   totalClaimedCount: BigInt
-  claimStreak: BigInt
+  totalClaimedValue: BigInt
+  claimStreak: BigInt!
   longestClaimStreak: BigInt
+  isCitizen: Boolean
+  dateJoined: BigInt
 }
 
 type TransactionStatistics @entity {
