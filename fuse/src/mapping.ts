@@ -17,7 +17,7 @@ import {
 
 import { WhitelistedAdded, WhitelistedRemoved } from '../generated/Identity/Identity'
 
-import { DailyUBI, Citizen } from '../generated/schema'
+import { DailyUBI, Citizen, Statistics } from '../generated/schema'
 
 export function handleActivatedUser(event: ActivatedUser): void {
   // // Entities can be loaded from the store using a string ID; this ID
@@ -115,7 +115,11 @@ export function handleUBICalculated(event: UBICalculated): void {
     quota.toString(),
     pool.toString(),
   ])
-  let dailyUbi = new DailyUBI(event.params.day.toString())
+
+  let dailyUbi = DailyUBI.load(event.params.day.toString())
+  if (dailyUbi == null) {
+    dailyUbi = new DailyUBI(event.params.day.toString())
+  }
   dailyUbi.pool = pool
   dailyUbi.quota = quota
   dailyUbi.activeUsers = activeUsers
@@ -127,48 +131,38 @@ export function handleUBIClaimed(event: UBIClaimed): void {
   log.info('handleUBIClaimed claimer start {}', [event.params.claimer.toHexString()])
   let citizen = Citizen.load(event.params.claimer.toHex())
 
-  let now = event.block.timestamp
-
   if (citizen == null) {
     citizen = new Citizen(event.params.claimer.toHex())
   }
 
+  let isUniqueClaimer = false
   if (citizen.lastClaimed == null) {
-    citizen.lastClaimed = now
+    isUniqueClaimer = true
   }
 
-  if (citizen.claimStreak == null) {
-    citizen.claimStreak = BigInt.fromI32(1)
+  aggregateCitizenFromUBIClaimed(event, citizen)
+
+  let statistics = Statistics.load('statistics')
+  if (statistics == null) {
+    statistics = new Statistics('statistics')
   }
 
-  if (citizen.longestClaimStreak == null) {
-    citizen.longestClaimStreak = BigInt.fromI32(1)
+  aggregateStatisticsFromUBIClaimed(event, statistics, isUniqueClaimer)
+
+  let ubiScheme = UBIScheme.bind(event.address)
+  let currentDay = ubiScheme.currentDay()
+  log.info('currentDay {}', [currentDay.toString()])
+  let dailyUbi = DailyUBI.load(currentDay.toString())
+  if (dailyUbi == null) {
+    dailyUbi = new DailyUBI(currentDay.toString())
   }
 
-  let yesterday = now.minus(BigInt.fromI32(24 * 60 * 60))
+  log.info('statistics.uniqueClaimers {}', [statistics.uniqueClaimers.toString()])
 
-  log.info('handleUBIClaimed claimer {}, citizen.claimStreak {}, citizen.longestClaimStreak {}',
-    [
-      event.params.claimer.toHexString(),
-      citizen.claimStreak.toString(),
-      citizen.longestClaimStreak.toString()
-    ])
+  dailyUbi.uniqueClaimers = statistics.uniqueClaimers
 
-  if (citizen.lastClaimed.ge(yesterday)) {
-    citizen.claimStreak = citizen.claimStreak.plus(BigInt.fromI32(1))
-  } else {
-    citizen.claimStreak = BigInt.fromI32(1)
-  }
+  aggregateDailyUbiFromUBIClaimed(event, dailyUbi)
 
-  if (citizen.longestClaimStreak.lt(citizen.claimStreak)) {
-    citizen.longestClaimStreak = citizen.claimStreak
-  }
-
-  citizen.totalClaimedCount = citizen.totalClaimedCount.plus(BigInt.fromI32(1))
-  citizen.totalClaimedValue = citizen.totalClaimedValue.plus(event.params.amount)
-
-  citizen.lastClaimed = now
-  citizen.save()
 }
 
 export function handleUBICycleCalculated(event: UBICycleCalculated): void { }
@@ -211,3 +205,88 @@ export function handleWhitelistedRemoved(event: WhitelistedRemoved): void {
   citizen.save()
 }
 
+function aggregateDailyUbiFromUBIClaimed(event: UBIClaimed, dailyUbi: DailyUBI | null): void {
+  if (dailyUbi.totalUBIDistributed == null) {
+    dailyUbi.totalUBIDistributed = event.params.amount
+  } else {
+    dailyUbi.totalUBIDistributed = dailyUbi.totalUBIDistributed.plus(event.params.amount)
+  }
+
+  if (dailyUbi.totalClaims == null) {
+    dailyUbi.totalClaims = BigInt.fromI32(1)
+  } else {
+    dailyUbi.totalClaims = dailyUbi.totalClaims.plus(BigInt.fromI32(1))
+  }
+
+  log.info('handleUBIClaimed dailyUbi.id {}, dailyUbi.totalUBIDistributed {}', [dailyUbi.id.toString(), dailyUbi.totalUBIDistributed.toString()])
+
+  dailyUbi.save()
+}
+
+function aggregateStatisticsFromUBIClaimed(event: UBIClaimed, statistics: Statistics | null, isUniqueClaimer: boolean): void {
+  if (statistics.totalUBIDistributed == null) {
+    statistics.totalUBIDistributed = event.params.amount
+  } else {
+    statistics.totalUBIDistributed = statistics.totalUBIDistributed.plus(event.params.amount)
+  }
+
+  if (isUniqueClaimer == true) {
+    if (statistics.uniqueClaimers == null) {
+      statistics.uniqueClaimers = BigInt.fromI32(1)
+    } else {
+      statistics.uniqueClaimers = statistics.uniqueClaimers.plus(BigInt.fromI32(1))
+    }
+
+  }
+
+  if (statistics.totalClaims == null) {
+    statistics.totalClaims = BigInt.fromI32(1)
+  } else {
+    statistics.totalClaims = statistics.totalClaims.plus(BigInt.fromI32(1))
+  }
+
+  statistics.save()
+
+}
+
+function aggregateCitizenFromUBIClaimed(event: UBIClaimed, citizen: Citizen | null): void {
+
+  let now = event.block.timestamp
+
+  if (citizen.lastClaimed == null) {
+    citizen.lastClaimed = now
+  }
+
+  if (citizen.claimStreak == null) {
+    citizen.claimStreak = BigInt.fromI32(1)
+  }
+
+  if (citizen.longestClaimStreak == null) {
+    citizen.longestClaimStreak = BigInt.fromI32(1)
+  }
+
+  let yesterday = now.minus(BigInt.fromI32(24 * 60 * 60))
+
+  log.info('handleUBIClaimed claimer {}, citizen.claimStreak {}, citizen.longestClaimStreak {}',
+    [
+      event.params.claimer.toHexString(),
+      citizen.claimStreak.toString(),
+      citizen.longestClaimStreak.toString()
+    ])
+
+  if (citizen.lastClaimed.ge(yesterday)) {
+    citizen.claimStreak = citizen.claimStreak.plus(BigInt.fromI32(1))
+  } else {
+    citizen.claimStreak = BigInt.fromI32(1)
+  }
+
+  if (citizen.longestClaimStreak.lt(citizen.claimStreak)) {
+    citizen.longestClaimStreak = citizen.claimStreak
+  }
+
+  citizen.totalClaimedCount = citizen.totalClaimedCount.plus(BigInt.fromI32(1))
+  citizen.totalClaimedValue = citizen.totalClaimedValue.plus(event.params.amount)
+
+  citizen.save()
+
+}

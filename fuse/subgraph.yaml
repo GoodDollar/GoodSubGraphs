@@ -42,8 +42,8 @@ dataSources:
         #   handler: handleSchemeStarted
         # - event: TotalFished(uint256)
         #   handler: handleTotalFished
-        # - event: UBICalculated(uint256,uint256,uint256)
-          # handler: handleUBICalculated
+          - event: UBICalculated(uint256,uint256,uint256)
+            handler: handleUBICalculated
           - event: UBIClaimed(indexed address,uint256)
             handler: handleUBIClaimed
         # - event: UBICycleCalculated(uint256,uint256,uint256,uint256)

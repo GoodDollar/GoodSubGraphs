@@ -22,8 +22,6 @@ export function handlePaymentWithdraw(event: PaymentWithdraw): void {
 
     // citizenTo.inTransactions = citizenTo.inTransactions.plus(BigInt.fromI32(1))
     citizenTo.inTransactionsClean = citizenTo.inTransactionsClean.plus(BigInt.fromI32(1))
-
-    // citizenTo.inTransactionsValue = citizenTo.inTransactionsValue.plus(event.params.amount)
     citizenTo.inTransactionsValueClean = citizenTo.inTransactionsValueClean.plus(event.params.amount)
 
     // citizenTo.totalTransactions = citizenTo.totalTransactions.plus(BigInt.fromI32(1))
@@ -31,7 +29,6 @@ export function handlePaymentWithdraw(event: PaymentWithdraw): void {
 
     // citizenTo.totalTransactionsValue = citizenTo.totalTransactionsValue.plus(event.params.amount)
     citizenTo.totalTransactionsValueClean = citizenTo.totalTransactionsValueClean.plus(event.params.amount)
-
     citizenTo.save()
 
     let citizenFrom = Citizen.load(event.params.from.toHex())
@@ -50,7 +47,6 @@ export function handlePaymentWithdraw(event: PaymentWithdraw): void {
 
     // citizenFrom.totalTransactionsValue = citizenFrom.totalTransactionsValue.plus(event.params.amount)
     citizenFrom.totalTransactionsValueClean = citizenFrom.totalTransactionsValueClean.plus(event.params.amount)
-
     citizenFrom.save()
   }
 }
