@@ -9,19 +9,19 @@ type DailyUBI @entity {
   timestamp: BigInt
 }
 
-type Citizen @entity {
+type WalletStatistics @entity {
   id: ID!
   balance: BigInt
-  inTransactions: BigInt
-  inTransactionsClean: BigInt
+  inTransactionsCount: BigInt
+  inTransactionsCountClean: BigInt
   inTransactionsValue: BigInt
   inTransactionsValueClean: BigInt
-  outTransactions: BigInt
-  outTransactionsClean: BigInt
+  outTransactionsCount: BigInt
+  outTransactionsCountClean: BigInt
   outTransactionsValue: BigInt
   outTransactionsValueClean: BigInt
-  totalTransactions: BigInt
-  totalTransactionsClean: BigInt
+  totalTransactionsCount: BigInt
+  totalTransactionsCountClean: BigInt
   totalTransactionsValue: BigInt
   totalTransactionsValueClean: BigInt
   lastClaimed: BigInt
@@ -29,7 +29,7 @@ type Citizen @entity {
   totalClaimedValue: BigInt
   claimStreak: BigInt!
   longestClaimStreak: BigInt
-  isCitizen: Boolean
+  isActive: Boolean
   dateJoined: BigInt
 }
 
@@ -42,7 +42,7 @@ type TransactionStatistics @entity {
   totalInCirculation: BigInt
 }
 
-type Statistics @entity {
+type GlobalStatistics @entity {
   id: ID!
   transactionStatistics: TransactionStatistics
   totalUBIDistributed: BigInt

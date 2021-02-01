@@ -17,7 +17,7 @@ import {
 
 import { WhitelistedAdded, WhitelistedRemoved } from '../generated/Identity/Identity'
 
-import { DailyUBI, Citizen, Statistics } from '../generated/schema'
+import { DailyUBI, WalletStatistics, GlobalStatistics } from '../generated/schema'
 
 export function handleActivatedUser(event: ActivatedUser): void {
   // // Entities can be loaded from the store using a string ID; this ID
@@ -129,10 +129,10 @@ export function handleUBICalculated(event: UBICalculated): void {
 
 export function handleUBIClaimed(event: UBIClaimed): void {
   log.info('handleUBIClaimed claimer start {}', [event.params.claimer.toHexString()])
-  let citizen = Citizen.load(event.params.claimer.toHex())
+  let citizen = WalletStatistics.load(event.params.claimer.toHex())
 
   if (citizen == null) {
-    citizen = new Citizen(event.params.claimer.toHex())
+    citizen = new WalletStatistics(event.params.claimer.toHex())
   }
 
   let isUniqueClaimer = false
@@ -142,9 +142,9 @@ export function handleUBIClaimed(event: UBIClaimed): void {
 
   aggregateCitizenFromUBIClaimed(event, citizen)
 
-  let statistics = Statistics.load('statistics')
+  let statistics = GlobalStatistics.load('statistics')
   if (statistics == null) {
-    statistics = new Statistics('statistics')
+    statistics = new GlobalStatistics('statistics')
   }
 
   aggregateStatisticsFromUBIClaimed(event, statistics, isUniqueClaimer)
@@ -175,10 +175,10 @@ export function handleWithdrawFromDao(event: WithdrawFromDao): void { }
 
 export function handleWhitelistedAdded(event: WhitelistedAdded): void {
   log.info('handleWhitelistedAdded event.params.account {}', [event.params.account.toHexString()])
-  let citizen = Citizen.load(event.params.account.toHex())
+  let citizen = WalletStatistics.load(event.params.account.toHex())
 
   if (citizen == null) {
-    citizen = new Citizen(event.params.account.toHex())
+    citizen = new WalletStatistics(event.params.account.toHex())
     citizen.claimStreak = BigInt.fromI32(0)
   }
 
@@ -186,7 +186,7 @@ export function handleWhitelistedAdded(event: WhitelistedAdded): void {
     citizen.dateJoined = event.block.timestamp
   }
 
-  citizen.isCitizen = true
+  citizen.isActive = true
   log.info('handleWhitelistedAdded citizen.dateJoined {}', [citizen.dateJoined.toString()])
 
   citizen.save()
@@ -194,13 +194,13 @@ export function handleWhitelistedAdded(event: WhitelistedAdded): void {
 
 export function handleWhitelistedRemoved(event: WhitelistedRemoved): void {
   log.info('handleWhitelistedRemoved event.params.account {}', [event.params.account.toHex()])
-  let citizen = Citizen.load(event.params.account.toHex())
+  let citizen = WalletStatistics.load(event.params.account.toHex())
 
   if (citizen == null) {
-    citizen = new Citizen(event.params.account.toHex())
+    citizen = new WalletStatistics(event.params.account.toHex())
   }
 
-  citizen.isCitizen = false
+  citizen.isActive = false
 
   citizen.save()
 }
@@ -223,7 +223,7 @@ function aggregateDailyUbiFromUBIClaimed(event: UBIClaimed, dailyUbi: DailyUBI |
   dailyUbi.save()
 }
 
-function aggregateStatisticsFromUBIClaimed(event: UBIClaimed, statistics: Statistics | null, isUniqueClaimer: boolean): void {
+function aggregateStatisticsFromUBIClaimed(event: UBIClaimed, statistics: GlobalStatistics | null, isUniqueClaimer: boolean): void {
   if (statistics.totalUBIDistributed == null) {
     statistics.totalUBIDistributed = event.params.amount
   } else {
@@ -249,7 +249,7 @@ function aggregateStatisticsFromUBIClaimed(event: UBIClaimed, statistics: Statis
 
 }
 
-function aggregateCitizenFromUBIClaimed(event: UBIClaimed, citizen: Citizen | null): void {
+function aggregateCitizenFromUBIClaimed(event: UBIClaimed, citizen: WalletStatistics | null): void {
 
   let now = event.block.timestamp
 
