@@ -119,3 +119,4 @@ dataSources:
         - event: WhitelistedRemoved(indexed address)
           handler: handleWhitelistedRemoved
       file: ./src/mapping.ts
+      
