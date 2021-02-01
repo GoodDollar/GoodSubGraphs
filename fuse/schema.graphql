@@ -1,9 +1,12 @@
 type DailyUBI @entity {
   id: ID!
-  pool: BigInt!
-  quota: BigInt!
-  activeUsers: BigInt!
-  timestamp: BigInt!
+  pool: BigInt
+  quota: BigInt
+  activeUsers: BigInt
+  totalUBIDistributed: BigInt
+  totalClaims: BigInt
+  uniqueClaimers: BigInt
+  timestamp: BigInt
 }
 
 type Citizen @entity {
@@ -42,4 +45,7 @@ type TransactionStatistics @entity {
 type Statistics @entity {
   id: ID!
   transactionStatistics: TransactionStatistics
+  totalUBIDistributed: BigInt
+  uniqueClaimers: BigInt
+  totalClaims: BigInt
 }
