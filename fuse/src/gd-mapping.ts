@@ -38,6 +38,8 @@ export function handlePauserRemoved(event: PauserRemoved): void { }
 
 export function handleTransfer(event: Transfer): void {
 
+  log.info('handleTransferEvent event.params.from {}, event.params.to {}, event.params.value {}, event.transaction.hash {}', [event.params.from.toHex(), event.params.to.toHex(), event.params.value.toString(), event.transaction.hash.toHex()])
+
   let aggregated = TransactionStatistics.load('aggregated')
 
   if (aggregated == null) {
@@ -62,19 +64,21 @@ export function handleTransfer(event: Transfer): void {
   let dailyStatistics = TransactionStatistics.load(dayTimestampStr)
   if (dailyStatistics == null) {
     dailyStatistics = new TransactionStatistics(dayTimestampStr)
+    dailyStatistics.dayStartBlockNumber = event.block.number
   }
   aggregateTransactionStatisticsFromTransfer(event, dailyStatistics)
   aggregateCitizenFromTransfer(event)
 
 }
 
-export function handleTransfer1(event: Transfer1): void { }
+// export function handleTransfer1(event: Transfer1): void { }
 
 export function handleUnpaused(event: Unpaused): void { }
 
 function aggregateTransactionStatisticsFromTransfer(event: Transfer, statistics: TransactionStatistics | null): void {
 
-  log.info('aggregateTransactionStatisticsFromTransfer event.params.from {}, event.params.to {}, event.params.value {}', [event.params.from.toHex(), event.params.to.toHex(), event.params.value.toString()])
+  log.info('aggregateTransactionStatisticsFromTransfer event.params.from {}, event.params.to {}, event.params.value {}, event.transaction.hash {}', [event.params.from.toHex(), event.params.to.toHex(), event.params.value.toString(), event.transaction.hash.toHex()])
+  // log.info('aggregateTransactionStatisticsFromTransfer event.params.from {}, event.params.to {}, event.params.value {}', [event.params.from.toHex(), event.params.to.toHex(), event.params.value.toString()])
 
   statistics.transactionsCount = statistics.transactionsCount.plus(BigInt.fromI32(1))
   statistics.transactionsValue = event.params.value.plus(statistics.transactionsValue as BigInt)
@@ -91,6 +95,7 @@ function aggregateTransactionStatisticsFromTransfer(event: Transfer, statistics:
   if (event.params.to.toHexString() == ZERO_ADDRESS) {
     statistics.totalInCirculation = statistics.totalInCirculation.minus(event.params.value)
   }
+
   if (event.params.from.toHexString() == ZERO_ADDRESS) {
     statistics.totalInCirculation = statistics.totalInCirculation.plus(event.params.value)
   }

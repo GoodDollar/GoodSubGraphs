@@ -35,6 +35,7 @@ type WalletStatistics @entity {
 
 type TransactionStatistics @entity {
   id: ID!
+  dayStartBlockNumber: BigInt
   transactionsCount: BigInt
   transactionsCountClean: BigInt
   transactionsValue: BigInt
