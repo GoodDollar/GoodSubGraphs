@@ -3,10 +3,64 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: UBIScheme
+    name: UBISchemeOld
     network: mainnet
     source:
       address: '0xAACbaaB8571cbECEB46ba85B5981efDB8928545e'
+      abi: UBIScheme
+      startBlock: 6280000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - ActivatedUser
+        - InactiveUserFished
+        - OwnershipTransferred
+        - SchemeEnded
+        - SchemeStarted
+        - TotalFished
+        - UBICalculated
+        - UBIClaimed
+        - UBICycleCalculated
+        - UBIEnded
+        - UBIStarted
+        - WithdrawFromDao
+      abis:
+        - name: UBIScheme
+          file: ./node_modules/@gooddollar/goodcontracts/stakingModel/build/contracts/UBIScheme.json
+      eventHandlers:
+        # - event: ActivatedUser(indexed address)
+        #   handler: handleActivatedUser
+        # - event: InactiveUserFished(indexed address,indexed address,uint256)
+        #   handler: handleInactiveUserFished
+        # - event: OwnershipTransferred(indexed address,indexed address)
+        #   handler: handleOwnershipTransferred
+        # - event: SchemeEnded(indexed address,uint256)
+        #   handler: handleSchemeEnded
+        # - event: SchemeStarted(indexed address,uint256)
+        #   handler: handleSchemeStarted
+        # - event: TotalFished(uint256)
+        #   handler: handleTotalFished
+          - event: UBICalculated(uint256,uint256,uint256)
+            handler: handleUBICalculated
+          - event: UBIClaimed(indexed address,uint256)
+            handler: handleUBIClaimed
+        # - event: UBICycleCalculated(uint256,uint256,uint256,uint256)
+        #   handler: handleUBICycleCalculated
+        # - event: UBIEnded(uint256,uint256)
+        #   handler: handleUBIEnded
+        # - event: UBIStarted(uint256,uint256)
+        #   handler: handleUBIStarted
+        # - event: WithdrawFromDao(uint256,uint256)
+        #   handler: handleWithdrawFromDao
+      file: ./src/mapping.ts
+
+  - kind: ethereum/contract
+    name: UBIScheme
+    network: mainnet
+    source:
+      address: '0xD7aC544F8A570C4d8764c3AAbCF6870CBD960D0D'
       abi: UBIScheme
       startBlock: 6280000
     mapping:
