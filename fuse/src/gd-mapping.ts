@@ -12,7 +12,7 @@ import {
   Transfer1,
   Unpaused,
 } from '../generated/GoodDollar/GoodDollar'
-import { GlobalStatistics, TransactionStatistics, WalletStatistics } from '../generated/schema'
+import { GlobalStatistics, TransactionStat, WalletStat } from '../generated/schema'
 
 import { fuse, fuse_mainnet, production, production_mainnet, staging, staging_mainnet, test, develop } from '../scripts/releases'
 
@@ -40,18 +40,18 @@ export function handleTransfer(event: Transfer): void {
 
   log.info('handleTransferEvent event.params.from {}, event.params.to {}, event.params.value {}, event.transaction.hash {}', [event.params.from.toHex(), event.params.to.toHex(), event.params.value.toString(), event.transaction.hash.toHex()])
 
-  let aggregated = TransactionStatistics.load('aggregated')
+  let aggregated = TransactionStat.load('aggregated')
 
   if (aggregated == null) {
-    aggregated = new TransactionStatistics('aggregated')
+    aggregated = new TransactionStat('aggregated')
   }
 
-  aggregateTransactionStatisticsFromTransfer(event, aggregated)
+  aggregateTransactionStatFromTransfer(event, aggregated)
 
   let statistics = GlobalStatistics.load('statistics')
   if (statistics == null) {
     statistics = new GlobalStatistics('statistics')
-    statistics.transactionStatistics = aggregated.id
+    statistics.TransactionStat = aggregated.id
     statistics.save()
   }
 
@@ -61,12 +61,12 @@ export function handleTransfer(event: Transfer): void {
   // remove .0 from string
   let dayTimestampStr = dayTimestamp.toString().split('.')[0]
   log.info('got timestamp {}', [dayTimestampStr])
-  let dailyStatistics = TransactionStatistics.load(dayTimestampStr)
+  let dailyStatistics = TransactionStat.load(dayTimestampStr)
   if (dailyStatistics == null) {
-    dailyStatistics = new TransactionStatistics(dayTimestampStr)
+    dailyStatistics = new TransactionStat(dayTimestampStr)
     dailyStatistics.dayStartBlockNumber = event.block.number
   }
-  aggregateTransactionStatisticsFromTransfer(event, dailyStatistics)
+  aggregateTransactionStatFromTransfer(event, dailyStatistics)
   aggregateCitizenFromTransfer(event)
 
 }
@@ -75,10 +75,10 @@ export function handleTransfer(event: Transfer): void {
 
 export function handleUnpaused(event: Unpaused): void { }
 
-function aggregateTransactionStatisticsFromTransfer(event: Transfer, statistics: TransactionStatistics | null): void {
+function aggregateTransactionStatFromTransfer(event: Transfer, statistics: TransactionStat | null): void {
 
-  log.info('aggregateTransactionStatisticsFromTransfer event.params.from {}, event.params.to {}, event.params.value {}, event.transaction.hash {}', [event.params.from.toHex(), event.params.to.toHex(), event.params.value.toString(), event.transaction.hash.toHex()])
-  // log.info('aggregateTransactionStatisticsFromTransfer event.params.from {}, event.params.to {}, event.params.value {}', [event.params.from.toHex(), event.params.to.toHex(), event.params.value.toString()])
+  log.info('aggregateTransactionStatFromTransfer event.params.from {}, event.params.to {}, event.params.value {}, event.transaction.hash {}', [event.params.from.toHex(), event.params.to.toHex(), event.params.value.toString(), event.transaction.hash.toHex()])
+  // log.info('aggregateTransactionStatFromTransfer event.params.from {}, event.params.to {}, event.params.value {}', [event.params.from.toHex(), event.params.to.toHex(), event.params.value.toString()])
 
   statistics.transactionsCount = statistics.transactionsCount.plus(BigInt.fromI32(1))
   statistics.transactionsValue = event.params.value.plus(statistics.transactionsValue as BigInt)
@@ -111,9 +111,9 @@ function aggregateCitizenFromTransfer(event: Transfer): void {
 
   log.info('aggregateCitizenFromTransfer event.params.from {}, event.params.to {}, event.params.value {}', [event.params.from.toHex(), event.params.to.toHex(), event.params.value.toString()])
 
-  let citizenFrom = WalletStatistics.load(event.params.from.toHex())
+  let citizenFrom = WalletStat.load(event.params.from.toHex())
   if (citizenFrom == null) {
-    citizenFrom = new WalletStatistics(event.params.from.toHexString())
+    citizenFrom = new WalletStat(event.params.from.toHexString())
     citizenFrom.outTransactionsCount = ZERO
     citizenFrom.outTransactionsCountClean = ZERO
     citizenFrom.outTransactionsValue = ZERO
@@ -155,9 +155,9 @@ function aggregateCitizenFromTransfer(event: Transfer): void {
       citizenFrom.balance.toString()
     ])
 
-  let citizenTo = WalletStatistics.load(event.params.to.toHexString())
+  let citizenTo = WalletStat.load(event.params.to.toHexString())
   if (citizenTo == null) {
-    citizenTo = new WalletStatistics(event.params.to.toHexString())
+    citizenTo = new WalletStat(event.params.to.toHexString())
     citizenTo.outTransactionsCount = ZERO
     citizenTo.outTransactionsCountClean = ZERO
     citizenTo.outTransactionsValue = ZERO
