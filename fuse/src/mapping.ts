@@ -19,6 +19,12 @@ import { WhitelistedAdded, WhitelistedRemoved } from '../generated/Identity/Iden
 
 import { DailyUBI, WalletStat, GlobalStatistics } from '../generated/schema'
 
+let ZERO = BigInt.fromI32(0)
+let oldUbiLastDay = BigInt.fromI32(186)
+
+const oldUBISchemeAddress = '0xaacbaab8571cbeceb46ba85b5981efdb8928545e'
+const newUBISchemeAddress = '0xd7ac544f8a570c4d8764c3aabcf6870cbd960d0d'
+
 export function handleActivatedUser(event: ActivatedUser): void {
   // // Entities can be loaded from the store using a string ID; this ID
   // // needs to be unique across all entities of the same type
@@ -116,10 +122,16 @@ export function handleUBICalculated(event: UBICalculated): void {
     pool.toString(),
   ])
 
-  let dailyUbi = DailyUBI.load(event.params.day.toString())
-  if (dailyUbi == null) {
-    dailyUbi = new DailyUBI(event.params.day.toString())
+  let currentDay = fixDailyUbiDaysCount(event.address.toHexString(), ubiScheme, oldUBISchemeAddress, newUBISchemeAddress)
+  if (currentDay.equals(BigInt.fromI32(-1))) {
+    return
   }
+
+  let dailyUbi = DailyUBI.load(currentDay.toString())
+  if (dailyUbi == null) {
+    dailyUbi = new DailyUBI(currentDay.toString())
+  }
+  dailyUbi.ubiSchemeAddress = event.address
   dailyUbi.pool = pool
   dailyUbi.quota = quota
   dailyUbi.activeUsers = activeUsers
@@ -149,15 +161,21 @@ export function handleUBIClaimed(event: UBIClaimed): void {
 
   aggregateStatisticsFromUBIClaimed(event, statistics, isUniqueClaimer)
 
+  log.info('statistics.uniqueClaimers {}', [statistics.uniqueClaimers.toString()])
+
   let ubiScheme = UBIScheme.bind(event.address)
-  let currentDay = ubiScheme.currentDay()
-  log.info('currentDay {}', [currentDay.toString()])
+
+  let currentDay = fixDailyUbiDaysCount(event.address.toHexString(), ubiScheme, oldUBISchemeAddress, newUBISchemeAddress)
+  if (currentDay.equals(BigInt.fromI32(-1))) {
+    return
+  }
+
+
   let dailyUbi = DailyUBI.load(currentDay.toString())
   if (dailyUbi == null) {
     dailyUbi = new DailyUBI(currentDay.toString())
   }
 
-  log.info('statistics.uniqueClaimers {}', [statistics.uniqueClaimers.toString()])
 
   aggregateDailyUbiFromUBIClaimed(event, dailyUbi, isUniqueClaimer)
 
@@ -205,6 +223,7 @@ export function handleWhitelistedRemoved(event: WhitelistedRemoved): void {
 }
 
 function aggregateDailyUbiFromUBIClaimed(event: UBIClaimed, dailyUbi: DailyUBI | null, isUniqueClaimer: boolean): void {
+  dailyUbi.ubiSchemeAddress = event.address
   if (dailyUbi.totalUBIDistributed == null) {
     dailyUbi.totalUBIDistributed = event.params.amount
   } else {
@@ -297,4 +316,29 @@ function aggregateCitizenFromUBIClaimed(event: UBIClaimed, citizen: WalletStat |
 
   citizen.save()
 
+}
+
+function fixDailyUbiDaysCount(address: String, ubiScheme: UBIScheme, oldUBISchemeAddress: String, newUBISchemeAddress: String): BigInt {
+  let currentDay = ubiScheme.currentDay()
+  log.info('old currentDay {}, event.address.toHexString {}', [currentDay.toString(), address.toString()])
+
+  // old ubi scheme and we are past the last day of old ubi
+  if (address == oldUBISchemeAddress && currentDay.gt(oldUbiLastDay)) {
+    log.info('oldUBISchemeAddress past last old ubi day returning {}', [address.toString()])
+    currentDay = BigInt.fromI32(-1)
+  }
+
+  // we don't count new ubi scheme day 0
+  if (address == newUBISchemeAddress && currentDay.equals(ZERO)) {
+    log.info('newUBISchemeAddress day 0 returning {}', [address.toString()])
+    currentDay = BigInt.fromI32(-1)
+  }
+
+  // continue days count of new ubiScheme from where the last ubiScheme stopped
+  if (address == newUBISchemeAddress && currentDay.gt(ZERO)) {
+    currentDay = currentDay.plus(oldUbiLastDay)
+  }
+
+  log.info('new currentDay {}, address.toHexString {}', [currentDay.toString(), address.toString()])
+  return currentDay
 }
