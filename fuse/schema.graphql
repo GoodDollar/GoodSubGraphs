@@ -7,9 +7,10 @@ type DailyUBI @entity {
   totalClaims: BigInt
   uniqueClaimers: BigInt
   timestamp: BigInt
+  ubiSchemeAddress: Bytes!
 }
 
-type WalletStatistics @entity {
+type WalletStat @entity {
   id: ID!
   balance: BigInt
   inTransactionsCount: BigInt
@@ -33,7 +34,7 @@ type WalletStatistics @entity {
   dateJoined: BigInt
 }
 
-type TransactionStatistics @entity {
+type TransactionStat @entity {
   id: ID!
   dayStartBlockNumber: BigInt
   transactionsCount: BigInt
@@ -45,7 +46,7 @@ type TransactionStatistics @entity {
 
 type GlobalStatistics @entity {
   id: ID!
-  transactionStatistics: TransactionStatistics
+  TransactionStat: TransactionStat
   totalUBIDistributed: BigInt
   uniqueClaimers: BigInt
   totalClaims: BigInt
