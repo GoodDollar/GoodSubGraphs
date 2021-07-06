@@ -1,12 +1,29 @@
 type TotalSupplyHistory @entity {
   id: ID!
+  block: BigInt!
   blockTimestamp: BigInt!
   totalSupply: BigInt!
   goodDollar: GoodDollarToken!
 }
 
+type ReserveHistory @entity {
+  id: ID!
+  block: BigInt!
+  blockTimestamp: BigInt!
+  openPriceCDAI: BigDecimal
+  openPriceDAI: BigDecimal
+  closePriceCDAI: BigDecimal
+  closePriceDAI: BigDecimal
+  marketCap: BigDecimal
+  reserveRatio: BigDecimal
+  reserveValueInDAI: BigDecimal
+  goodDollar: GoodDollarToken!
+}
+
 type GoodDollarToken @entity {
   id: ID!
-  totalSupply: BigInt!
-  totalSupplyHistory: [TotalSupplyHistory!]! @derivedFrom(field: "goodDollar")
+  totalSupply: BigInt
+  totalSupplyHistory: [TotalSupplyHistory!] @derivedFrom(field: "goodDollar")
+  reserveHistory: [ReserveHistory!] @derivedFrom(field: "goodDollar")
+  latestReserveData: ReserveHistory
 }

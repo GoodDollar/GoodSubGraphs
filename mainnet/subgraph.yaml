@@ -16,38 +16,37 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - MinterAdded
-        - MinterRemoved
-        - Paused
-        - Unpaused
-        - PauserAdded
-        - PauserRemoved
-        - OwnershipTransferred
         - Transfer
-        - Approval
-        - Transfer1
       abis:
         - name: GoodDollar
           file: ./abis/GoodDollar.json
       eventHandlers:
-        - event: MinterAdded(indexed address)
-          handler: handleMinterAdded
-        - event: MinterRemoved(indexed address)
-          handler: handleMinterRemoved
-        - event: Paused(address)
-          handler: handlePaused
-        - event: Unpaused(address)
-          handler: handleUnpaused
-        - event: PauserAdded(indexed address)
-          handler: handlePauserAdded
-        - event: PauserRemoved(indexed address)
-          handler: handlePauserRemoved
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApproval
-        - event: Transfer(indexed address,indexed address,uint256,bytes)
-          handler: handleTransfer1
+      file: ./src/mapping.ts
+
+  - kind: ethereum/contract
+    name: GoodMarketMaker
+    network: mainnet
+    source:
+      address: '0xEDbE438Cd865992fDB72dd252E6055A71b02BE72'
+      abi: GoodMarketMaker
+      startBlock: 10591792
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - BalancesUpdated
+        - UBIExpansionMinted
+      abis:
+        - name: GoodMarketMaker
+          file: ./abis/GoodMarketMaker.json
+        - name: cToken
+          file: ./abis/cERC20.json
+      eventHandlers:
+        - event: BalancesUpdated(indexed address,indexed address,uint256,uint256,uint256,uint256)
+          handler: handleTokenSale
+        - event: UBIExpansionMinted(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleExpansion
       file: ./src/mapping.ts
