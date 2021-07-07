@@ -3,7 +3,10 @@ import { PaymentWithdraw } from '../generated/OneTimePayments/OneTimePayments'
 
 import { WalletStat, TransactionStat } from '../generated/schema'
 
-let contracts: Array<string> = ['0x495d133B938596C9984d462F007B676bDc57eCEC', '0x0be7C592374EE0bD0CcBFC76Be758a138BcaEc6E', '0xFa8d865A962ca8456dF331D78806152d3aC5B84F', '0xf96dADc6D71113F6500e97590760C924dA1eF70e', '0xBcE053b99e22158f8B62f4DBFbEdE1f936b2D4e4', '0x795CED99774430DF8902D8699388924a213A5aA6', '0x12F706FaafCBf8093282Dba0c40eD0D4Eb5CAF54', '0x653c67Be5b3739708e84B61641253822405d78D8', '0x9F75dAcB77419b87f568d417eBc84346e134144E', '0x0000000000000000000000000000000000000000', '0x0000000000000000000000000000000000000000', '0xd9Aa86e0Ddb932bD78ab8c71C1B98F83cF610Bd4']
+import { fuse, fuse_mainnet, production, production_mainnet, staging, staging_mainnet, test, develop } from '../scripts/releases'
+
+// Change this according to working environment
+let contracts = production
 
 export function handlePaymentWithdraw(event: PaymentWithdraw): void {
   log.info('handlePaymentWithdraw from: {} to: {} paymentId: {} amount: {}', [
