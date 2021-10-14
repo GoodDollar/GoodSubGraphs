@@ -30,7 +30,7 @@ type WalletStat @entity {
   totalClaimedValue: BigInt
   claimStreak: BigInt!
   longestClaimStreak: BigInt
-  isActive: Boolean
+  isWhitelisted: Boolean
   dateJoined: BigInt
 }
 

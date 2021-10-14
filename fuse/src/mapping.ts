@@ -202,7 +202,7 @@ export function handleWhitelistedAdded(event: WhitelistedAdded): void {
     citizen.dateJoined = event.block.timestamp
   }
 
-  citizen.isActive = true
+  citizen.isWhitelisted = true
   log.info('handleWhitelistedAdded citizen.dateJoined {}', [citizen.dateJoined.toString()])
 
   citizen.save()
@@ -217,7 +217,7 @@ export function handleWhitelistedRemoved(event: WhitelistedRemoved): void {
     citizen.claimStreak = BigInt.fromI32(0)
   }
 
-  citizen.isActive = false
+  citizen.isWhitelisted = false
 
   citizen.save()
 }
@@ -278,11 +278,7 @@ function aggregateStatisticsFromUBIClaimed(event: UBIClaimed, statistics: Global
 
 function aggregateCitizenFromUBIClaimed(event: UBIClaimed, citizen: WalletStat | null): void {
 
-  let now = event.block.timestamp
-
-  if (citizen.lastClaimed == null) {
-    citizen.lastClaimed = now
-  }
+  let now = event.block.timestamp  
 
   if (citizen.claimStreak == null) {
     citizen.claimStreak = BigInt.fromI32(1)
@@ -313,6 +309,7 @@ function aggregateCitizenFromUBIClaimed(event: UBIClaimed, citizen: WalletStat |
 
   citizen.totalClaimedCount = citizen.totalClaimedCount.plus(BigInt.fromI32(1))
   citizen.totalClaimedValue = citizen.totalClaimedValue.plus(event.params.amount)
+  citizen.lastClaimed = now
 
   citizen.save()
 
