@@ -20,7 +20,7 @@ import { WhitelistedAdded, WhitelistedRemoved } from '../generated/Identity/Iden
 import { DailyUBI, WalletStat, GlobalStatistics } from '../generated/schema'
 
 let ZERO = BigInt.fromI32(0)
-const enableLogs = false;
+const enableLogs = true;
 
 
 export function handleUBICalculated(event: UBICalculated): void {
@@ -96,17 +96,26 @@ export function handleUBIClaimed(event: UBIClaimed): void {
   }
 
 
-  let dailyUbi = DailyUBI.load(currentDay.toString())
-  if (dailyUbi == null) {
-    dailyUbi = new DailyUBI(currentDay.toString())
-  }
+  let dailyUbi = DailyUBI.load(currentDay.toString())  //cant be null because event to create day must happened before
+
 
 
   aggregateDailyUbiFromUBIClaimed(event, dailyUbi, isUniqueClaimer)
 
 }
 
-export function handleUBICycleCalculated(event: UBICycleCalculated): void { }
+export function handleUBICycleCalculated(event: UBICycleCalculated): void {
+  const day = getCurrentDay(event.address.toHexString(), event.block.timestamp)
+  let dailyUbi = new DailyUBI(day.toString())
+
+  dailyUbi.cycleLength = event.params.cycleLength
+  dailyUbi.balance = event.params.pool
+  dailyUbi.pool = event.params.dailyUBIPool
+  if(enableLogs) log.info('handleUBICycleCalculated {} {} {}', [dailyUbi.cycleLength.toString(), dailyUbi.balance.toString(), dailyUbi.pool.toString()])
+
+  dailyUbi.save()
+
+ }
 
 export function handleWhitelistedAdded(event: WhitelistedAdded): void {
   if(enableLogs) log.info('handleWhitelistedAdded event.params.account {}', [event.params.account.toHexString()])
@@ -115,6 +124,7 @@ export function handleWhitelistedAdded(event: WhitelistedAdded): void {
   if (citizen == null) {
     citizen = new WalletStat(event.params.account.toHex())
     citizen.dateAppeared = event.block.timestamp
+    citizen.claimStreak = ZERO
   }
 
   if (citizen.dateJoined == null) {
@@ -134,6 +144,8 @@ export function handleWhitelistedRemoved(event: WhitelistedRemoved): void {
   if (citizen == null) {
     citizen = new WalletStat(event.params.account.toHex())
     citizen.dateAppeared = event.block.timestamp
+    citizen.claimStreak = ZERO
+
   }
 
   citizen.isWhitelisted = false

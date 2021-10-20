@@ -8,7 +8,7 @@ dataSources:
     source:
       address: '0xAACbaaB8571cbECEB46ba85B5981efDB8928545e'
       abi: UBIScheme
-      startBlock: 6280000
+      startBlock: 6246324
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -16,7 +16,6 @@ dataSources:
       entities:
         - UBICalculated
         - UBIClaimed
-        - UBICycleCalculated
       abis:
         - name: UBIScheme
           file: ./node_modules/@gooddollar/goodcontracts/stakingModel/build/contracts/UBIScheme.json
@@ -33,7 +32,7 @@ dataSources:
     source:
       address: '0xD7aC544F8A570C4d8764c3AAbCF6870CBD960D0D'
       abi: UBIScheme
-      startBlock: 6280000
+      startBlock: 9376522
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -49,6 +48,8 @@ dataSources:
       eventHandlers:
           - event: UBICalculated(uint256,uint256,uint256)
             handler: handleUBICalculated
+          - event: UBICycleCalculated(uint256,uint256,uint256,uint256)
+            handler: handleUBICycleCalculated
           - event: UBIClaimed(indexed address,uint256)
             handler: handleUBIClaimed
       file: ./src/mapping.ts
@@ -59,7 +60,7 @@ dataSources:
     source:
       address: '0x495d133B938596C9984d462F007B676bDc57eCEC'
       abi: GoodDollar
-      startBlock: 6280000
+      startBlock: 6246324
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -82,7 +83,7 @@ dataSources:
     source:
       address: '0xd9Aa86e0Ddb932bD78ab8c71C1B98F83cF610Bd4'
       abi: OneTimePayments
-      startBlock: 6280000
+      startBlock: 6246324
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -103,7 +104,7 @@ dataSources:
     source:
       address: '0xFa8d865A962ca8456dF331D78806152d3aC5B84F'
       abi: Identity
-      startBlock: 6280000
+      startBlock: 6246324
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

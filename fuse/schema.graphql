@@ -7,7 +7,10 @@ type DailyUBI @entity {
   totalClaims: BigInt
   uniqueClaimers: BigInt
   timestamp: BigInt
-  ubiSchemeAddress: Bytes!
+  ubiSchemeAddress: Bytes
+  balance: BigInt
+  cycleLength: BigInt
+  dayInCycle: BigInt
 }
 
 type WalletStat @entity {

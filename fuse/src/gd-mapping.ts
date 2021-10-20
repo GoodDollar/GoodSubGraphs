@@ -95,6 +95,7 @@ function aggregateCitizenFromTransfer(event: Transfer): void {
   let citizenFrom = WalletStat.load(event.params.from.toHex())
   if (citizenFrom == null) {
     citizenFrom = new WalletStat(event.params.from.toHexString())
+    citizenFrom.claimStreak = ZERO
     citizenFrom.dateAppeared = event.block.timestamp
     citizenFrom.outTransactionsCount = ZERO
     citizenFrom.outTransactionsCountClean = ZERO
@@ -141,6 +142,7 @@ function aggregateCitizenFromTransfer(event: Transfer): void {
   let citizenTo = WalletStat.load(event.params.to.toHexString())
   if (citizenTo == null) {
     citizenTo = new WalletStat(event.params.to.toHexString())
+    citizenTo.claimStreak = ZERO
     citizenTo.dateAppeared = event.block.timestamp
     citizenTo.outTransactionsCount = ZERO
     citizenTo.outTransactionsCountClean = ZERO

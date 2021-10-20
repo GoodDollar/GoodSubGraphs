@@ -23,6 +23,7 @@ export function handlePaymentWithdraw(event: PaymentWithdraw): void {
     if (citizenTo == null) {
       citizenTo = new WalletStat(event.params.to.toHex())
       citizenTo.dateAppeared = event.block.timestamp
+      citizenTo.claimStreak = BigInt.fromI32(0)
     }
 
     citizenTo.lastTransactionTo = event.block.timestamp 
@@ -41,6 +42,7 @@ export function handlePaymentWithdraw(event: PaymentWithdraw): void {
     if (citizenFrom == null) {
       citizenFrom = new WalletStat(event.params.from.toHex())
       citizenFrom.dateAppeared = event.block.timestamp
+      citizenFrom.claimStreak = BigInt.fromI32(0)
     }
 
     citizenFrom.lastTransactionFrom = event.block.timestamp 
