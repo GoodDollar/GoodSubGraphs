@@ -50,3 +50,24 @@ dataSources:
         - event: UBIExpansionMinted(indexed address,indexed address,uint256,uint256,uint256)
           handler: handleExpansion
       file: ./src/mapping.ts
+
+  - kind: ethereum/contract
+    name: GoodReserveCDai
+    network: mainnet
+    source:
+      address: '0xEDbE438Cd865992fDB72dd252E6055A71b02BE72'
+      abi: GoodReserveCDai
+      startBlock: 10591792
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - UBIMinted
+      abis:
+        - name: GoodReserveCDai
+          file: ./abis/GoodReserveCDai.json
+      eventHandlers:
+        - event: UBIMinted(indexed uint256,indexed address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleUBIMinted
+      file: ./src/mapping.ts

@@ -18,6 +18,10 @@ type ReserveHistory @entity {
   reserveRatio: BigDecimal
   reserveValueInDAI: BigDecimal
   goodDollar: GoodDollarToken!
+  totalSupply: BigInt
+  ubiMintedFromExpansion: BigInt
+  ubiMintedFromInterest: BigInt
+  interestReceived: BigInt
 }
 
 type GoodDollarToken @entity {

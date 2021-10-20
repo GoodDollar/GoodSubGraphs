@@ -1,64 +1,28 @@
 import { BigInt, ethereum, log, BigDecimal, Address } from '@graphprotocol/graph-ts'
 import { GoodDollar, Transfer } from '../generated/GoodDollar/GoodDollar'
 import { BalancesUpdated, UBIExpansionMinted, GoodMarketMaker } from '../generated/GoodMarketMaker/GoodMarketMaker'
+import { UBIMinted } from '../generated/GoodReserveCDai/GoodReserveCDai'
 import { cToken } from '../generated/GoodMarketMaker/cToken'
 import { TotalSupplyHistory, GoodDollarToken, ReserveHistory } from '../generated/schema'
 
 let e18 = BigInt.fromString('1000000000000000000')
 let e8 = BigInt.fromString('100000000')
 
-export function handleTransfer(event: Transfer): void {
-  let tokenContract = GoodDollar.bind(event.address)
-  log.debug('got contract', [])
-  let token = GoodDollarToken.load('GoodDollar')
-  log.debug('got token', [])
-  let blockTimestamp = event.block.timestamp
-  let dayTimestamp = blockTimestamp.minus(blockTimestamp.mod(BigInt.fromI32(60 * 60 * 24)))
-  log.debug('got timestamp {}', [dayTimestamp.toString()])
+export function handleUBIMinted(event: UBIMinted): void {
+  _updateReserveHistory(event.block.timestamp, event.block.number, event)
 
-  if (token == null) {
-    log.debug('creating token', [])
-
-    token = new GoodDollarToken('GoodDollar')
-  }
-
-  token.totalSupply = tokenContract.totalSupply()
-  log.debug('set total supply {}', [token.totalSupply.toString()])
-  let dayExists = TotalSupplyHistory.load(dayTimestamp.toString())
-  log.debug('got day exists', [])
-  let dayId = dayExists ? dayExists.id : ''
-  log.debug('event {} - token totalSupply at block {}: {}. dayRecord {}. dayTimestamp {}.', [
-    event.transaction.hash.toHex(),
-    event.block.number.toString(),
-    token.totalSupply.toString(),
-    dayId,
-    dayTimestamp.toString(),
-  ])
-
-  if (dayExists == null) {
-    let supplyHistory = new TotalSupplyHistory(dayTimestamp.toString())
-    supplyHistory.totalSupply = tokenContract.totalSupply()
-    supplyHistory.blockTimestamp = event.block.timestamp
-    supplyHistory.goodDollar = token.id
-    supplyHistory.block = event.block.number
-    supplyHistory.save()
-  }
-  token.save()
-}
-
-export function handleExpansion(event: UBIExpansionMinted): void {
-  _updateReserveHistory(event.address, event.block.timestamp, event.block.number)
 }
 
 export function handleTokenSale(event: BalancesUpdated): void {
-  _updateReserveHistory(event.address, event.block.timestamp, event.block.number)
+  _updateReserveHistory(event.block.timestamp, event.block.number)
 }
 
 //collects price + reserve data
 //each ReserveHistory record holds the last update for that day
-function _updateReserveHistory(marketMaker: Address, blockTimestamp: BigInt, blockNumber: BigInt): void {
+function _updateReserveHistory(blockTimestamp: BigInt, blockNumber: BigInt, ubimintedEvent?: UBIMinted): void {
   let reserveToken = Address.fromString('0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643') //cdai mainnet
-  let reserveContract = GoodMarketMaker.bind(marketMaker)
+  let tokenContract = GoodDollar.bind(Address.fromString('0x67C5870b4A41D4Ebef24d2456547A03F1f3e094B')) //g$ mainnet
+  let reserveContract = GoodMarketMaker.bind(Address.fromString("0xEDbE438Cd865992fDB72dd252E6055A71b02BE72"))
   let curPrice = reserveContract.currentPrice(reserveToken)
   let cdaiContract = cToken.bind(reserveToken)
 
@@ -86,6 +50,7 @@ function _updateReserveHistory(marketMaker: Address, blockTimestamp: BigInt, blo
     reserveHistory.goodDollar = token.id
   }
 
+  reserveHistory.totalSupply = tokenContract.totalSupply()
   reserveHistory.blockTimestamp = blockTimestamp
   reserveHistory.block = blockNumber
 
@@ -96,13 +61,20 @@ function _updateReserveHistory(marketMaker: Address, blockTimestamp: BigInt, blo
     .times(curPrice)
     .div(e18) //return price in dai wei
 
+  if(ubimintedEvent != null) {
+    reserveHistory.ubiMintedFromExpansion = ubimintedEvent.params.gdExpansionMinted
+    reserveHistory.ubiMintedFromInterest = ubimintedEvent.params.gdInterestMinted;
+    reserveHistory.interestReceived = ubimintedEvent.params.interestReceived;
+
+
+  }
   log.warning('handleTokenSale price {} {} {}', [
     priceDAIWei.toString(),
     token.totalSupply.toString(),
     curPrice.toString(),
   ])
 
-  reserveHistory.marketCap = token.totalSupply
+  reserveHistory.marketCap = reserveHistory.totalSupply
     .times(priceDAIWei)
     .toBigDecimal()
     .div(e18.toBigDecimal()) // return in dai decimals
@@ -133,9 +105,6 @@ function _updateReserveHistory(marketMaker: Address, blockTimestamp: BigInt, blo
     .div(e18.toBigDecimal()) // results in dai decimals
 
   reserveHistory.save()
-
-  token.latestReserveData = reserveHistory.id
-  token.save()
 
   // log.debug('handleTokenSale done: {} {} {} {} {}', [
   //   reserveHistory.marketCap.toString(),
