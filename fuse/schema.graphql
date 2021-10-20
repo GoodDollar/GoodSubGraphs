@@ -12,6 +12,7 @@ type DailyUBI @entity {
 
 type WalletStat @entity {
   id: ID!
+  dateAppeared: BigInt
   balance: BigInt
   inTransactionsCount: BigInt
   inTransactionsCountClean: BigInt
@@ -32,6 +33,8 @@ type WalletStat @entity {
   longestClaimStreak: BigInt
   isWhitelisted: Boolean
   dateJoined: BigInt
+  lastTransactionFrom: BigInt
+  lastTransactionTo: BigInt
 }
 
 type TransactionStat @entity {

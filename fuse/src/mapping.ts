@@ -20,92 +20,11 @@ import { WhitelistedAdded, WhitelistedRemoved } from '../generated/Identity/Iden
 import { DailyUBI, WalletStat, GlobalStatistics } from '../generated/schema'
 
 let ZERO = BigInt.fromI32(0)
-let oldUbiLastDay = BigInt.fromI32(186)
+const enableLogs = false;
 
-const oldUBISchemeAddress = '0xaacbaab8571cbeceb46ba85b5981efdb8928545e'
-const newUBISchemeAddress = '0xd7ac544f8a570c4d8764c3aabcf6870cbd960d0d'
-
-export function handleActivatedUser(event: ActivatedUser): void {
-  // // Entities can be loaded from the store using a string ID; this ID
-  // // needs to be unique across all entities of the same type
-  // let entity = ExampleEntity.load(event.transaction.from.toHex())
-  // // Entities only exist after they have been saved to the store;
-  // // `null` checks allow to create entities on demand
-  // if (entity == null) {
-  //   entity = new ExampleEntity(event.transaction.from.toHex())
-  //   // Entity fields can be set using simple assignments
-  //   entity.count = BigInt.fromI32(0)
-  // }
-  // // BigInt and BigDecimal math are supported
-  // entity.count = entity.count + BigInt.fromI32(1)
-  // // Entity fields can be set based on event parameters
-  // entity.account = event.params.account
-  // // Entities can be written to the store with `.save()`
-  // entity.save()
-  // Note: If a handler doesn't require existing field values, it is faster
-  // _not_ to load the entity from the store. Instead, create it fresh with
-  // `new Entity(...)`, set the fields that should be updated and save the
-  // entity back to the store. Fields that were not set or unset remain
-  // unchanged, allowing for partial updates to be applied.
-  // It is also possible to access smart contracts from mappings. For
-  // example, the contract that has emitted the event can be connected to
-  // with:
-  //
-  // let contract = Contract.bind(event.address)
-  //
-  // The following functions can then be called on this contract to access
-  // state variables and other data:
-  //
-  // - contract.activeUsersCount(...)
-  // - contract.claimDistribution(...)
-  // - contract.currentCycleLength(...)
-  // - contract.currentDay(...)
-  // - contract.cycleLength(...)
-  // - contract.dailyCyclePool(...)
-  // - contract.dailyUBIHistory(...)
-  // - contract.dailyUbi(...)
-  // - contract.firstClaimPool(...)
-  // - contract.fishedUsersAddresses(...)
-  // - contract.getClaimAmount(...)
-  // - contract.getClaimerCount(...)
-  // - contract.getDailyStats(...)
-  // - contract.identity(...)
-  // - contract.isActive(...)
-  // - contract.isOwner(...)
-  // - contract.isRegistered(...)
-  // - contract.isRegistered(...)
-  // - contract.iterationGasLimit(...)
-  // - contract.lastClaimed(...)
-  // - contract.lastWithdrawDay(...)
-  // - contract.maxInactiveDays(...)
-  // - contract.owner(...)
-  // - contract.periodEnd(...)
-  // - contract.periodStart(...)
-  // - contract.shouldWithdrawFromDAO(...)
-  // - contract.startOfCycle(...)
-  // - contract.totalClaimsPerUser(...)
-  // - contract.currentDayInCycle(...)
-  // - contract.hasClaimed(...)
-  // - contract.isNotNewUser(...)
-  // - contract.isActiveUser(...)
-  // - contract.checkEntitlement(...)
-  // - contract.claim(...)
-  // - contract.fish(...)
-  // - contract.fishMulti(...)
-}
-
-export function handleInactiveUserFished(event: InactiveUserFished): void { }
-
-export function handleOwnershipTransferred(event: OwnershipTransferred): void { }
-
-export function handleSchemeEnded(event: SchemeEnded): void { }
-
-export function handleSchemeStarted(event: SchemeStarted): void { }
-
-export function handleTotalFished(event: TotalFished): void { }
 
 export function handleUBICalculated(event: UBICalculated): void {
-  log.info('handleUBICalculated event.params.day {}, event.params.dailyUbi {}, event.params.blockNumber {}',
+  if(enableLogs) log.info('handleUBICalculated event.params.day {}, event.params.dailyUbi {}, event.params.blockNumber {}',
     [
       event.params.day.toString(),
       event.params.dailyUbi.toString(),
@@ -116,16 +35,21 @@ export function handleUBICalculated(event: UBICalculated): void {
   let activeUsers = ubiScheme.activeUsersCount()
   let quota = event.params.dailyUbi
   let pool = activeUsers.times(quota)
-  log.info('dailyubi details: active: {} quota: {} pool: {}', [
+  if(enableLogs) log.info('dailyubi details: active: {} quota: {} pool: {}', [
     activeUsers.toString(),
     quota.toString(),
     pool.toString(),
   ])
 
-  let currentDay = fixDailyUbiDaysCount(event.address.toHexString(), ubiScheme, oldUBISchemeAddress, newUBISchemeAddress)
+  let currentDay = getCurrentDay(event.address.toHexString(), event.block.timestamp)
+  //fixDailyUbiDaysCount(event.address.toHexString(), ubiScheme, oldUBISchemeAddress, newUBISchemeAddress)
   if (currentDay.equals(BigInt.fromI32(-1))) {
     return
   }
+
+  //dont use first ubicalculated event of new ubi scheme so it doesnt override the valid
+  if(currentDay.equals(OLDUBI_LAST_DAY) && event.address.toHexString() == NEWUBI)
+    return
 
   let dailyUbi = DailyUBI.load(currentDay.toString())
   if (dailyUbi == null) {
@@ -140,19 +64,21 @@ export function handleUBICalculated(event: UBICalculated): void {
 }
 
 export function handleUBIClaimed(event: UBIClaimed): void {
-  log.info('handleUBIClaimed claimer start {}, contract address {}', [event.params.claimer.toHexString(), event.address.toHexString()])
+  if(enableLogs) log.info('handleUBIClaimed claimer start {}, contract address {}', [event.params.claimer.toHexString(), event.address.toHexString()])
   let citizen = WalletStat.load(event.params.claimer.toHex())
-
-  if (citizen == null) {
-    citizen = new WalletStat(event.params.claimer.toHex())
-  }
-
   let isUniqueClaimer = false
-  if (citizen.lastClaimed == null) {
+  if (citizen == null) {
+    citizen = new WalletStat(event.params.claimer.toHexString())
+    citizen.dateAppeared = event.block.timestamp
+    citizen.lastClaimed = event.block.timestamp
+    citizen.claimStreak = BigInt.fromI32(1)
+    citizen.longestClaimStreak = BigInt.fromI32(1)
     isUniqueClaimer = true
+  } else {
+    log.info('handleUBIClaimed claimer found {}, contract address {}', [event.params.claimer.toHexString(), event.address.toHexString()])
   }
 
-  aggregateCitizenFromUBIClaimed(event, citizen)
+  aggregateCitizenFromUBIClaimed(event, citizen as WalletStat)
 
   let statistics = GlobalStatistics.load('statistics')
   if (statistics == null) {
@@ -161,11 +87,10 @@ export function handleUBIClaimed(event: UBIClaimed): void {
 
   aggregateStatisticsFromUBIClaimed(event, statistics, isUniqueClaimer)
 
-  log.info('statistics.uniqueClaimers {}', [statistics.uniqueClaimers.toString()])
+  if(enableLogs) log.info('statistics.uniqueClaimers {}', [statistics.uniqueClaimers.toString()])
 
-  let ubiScheme = UBIScheme.bind(event.address)
-
-  let currentDay = fixDailyUbiDaysCount(event.address.toHexString(), ubiScheme, oldUBISchemeAddress, newUBISchemeAddress)
+  let currentDay = getCurrentDay(event.address.toHexString(), event.block.timestamp)
+  // let currentDay = fixDailyUbiDaysCount(event.address.toHexString(), ubiScheme, oldUBISchemeAddress, newUBISchemeAddress)
   if (currentDay.equals(BigInt.fromI32(-1))) {
     return
   }
@@ -183,19 +108,13 @@ export function handleUBIClaimed(event: UBIClaimed): void {
 
 export function handleUBICycleCalculated(event: UBICycleCalculated): void { }
 
-export function handleUBIEnded(event: UBIEnded): void { }
-
-export function handleUBIStarted(event: UBIStarted): void { }
-
-export function handleWithdrawFromDao(event: WithdrawFromDao): void { }
-
 export function handleWhitelistedAdded(event: WhitelistedAdded): void {
-  log.info('handleWhitelistedAdded event.params.account {}', [event.params.account.toHexString()])
+  if(enableLogs) log.info('handleWhitelistedAdded event.params.account {}', [event.params.account.toHexString()])
   let citizen = WalletStat.load(event.params.account.toHex())
 
   if (citizen == null) {
     citizen = new WalletStat(event.params.account.toHex())
-    citizen.claimStreak = BigInt.fromI32(0)
+    citizen.dateAppeared = event.block.timestamp
   }
 
   if (citizen.dateJoined == null) {
@@ -203,18 +122,18 @@ export function handleWhitelistedAdded(event: WhitelistedAdded): void {
   }
 
   citizen.isWhitelisted = true
-  log.info('handleWhitelistedAdded citizen.dateJoined {}', [citizen.dateJoined.toString()])
+  if(enableLogs) log.info('handleWhitelistedAdded citizen.dateJoined {}', [citizen.dateJoined.toString()])
 
   citizen.save()
 }
 
 export function handleWhitelistedRemoved(event: WhitelistedRemoved): void {
-  log.info('handleWhitelistedRemoved event.params.account {}', [event.params.account.toHex()])
+  if(enableLogs) log.info('handleWhitelistedRemoved event.params.account {}', [event.params.account.toHex()])
   let citizen = WalletStat.load(event.params.account.toHex())
 
   if (citizen == null) {
     citizen = new WalletStat(event.params.account.toHex())
-    citizen.claimStreak = BigInt.fromI32(0)
+    citizen.dateAppeared = event.block.timestamp
   }
 
   citizen.isWhitelisted = false
@@ -245,7 +164,7 @@ function aggregateDailyUbiFromUBIClaimed(event: UBIClaimed, dailyUbi: DailyUBI |
 
   }
 
-  log.info('handleUBIClaimed dailyUbi.id {}, dailyUbi.totalUBIDistributed {}, dailyUbi.uniqueClaimers {}, contract address {}', [dailyUbi.id.toString(), dailyUbi.totalUBIDistributed.toString(), dailyUbi.uniqueClaimers.toString(), event.address.toHexString()])
+  if(enableLogs) log.info('handleUBIClaimed dailyUbi.id {}, dailyUbi.totalUBIDistributed {}, dailyUbi.uniqueClaimers {}, contract address {}', [dailyUbi.id.toString(), dailyUbi.totalUBIDistributed.toString(), dailyUbi.uniqueClaimers.toString(), event.address.toHexString()])
 
   dailyUbi.save()
 }
@@ -276,21 +195,13 @@ function aggregateStatisticsFromUBIClaimed(event: UBIClaimed, statistics: Global
 
 }
 
-function aggregateCitizenFromUBIClaimed(event: UBIClaimed, citizen: WalletStat | null): void {
+function aggregateCitizenFromUBIClaimed(event: UBIClaimed, citizen: WalletStat): void {
 
   let now = event.block.timestamp  
 
-  if (citizen.claimStreak == null) {
-    citizen.claimStreak = BigInt.fromI32(1)
-  }
-
-  if (citizen.longestClaimStreak == null) {
-    citizen.longestClaimStreak = BigInt.fromI32(1)
-  }
-
   let yesterday = now.minus(BigInt.fromI32(24 * 60 * 60))
 
-  log.info('handleUBIClaimed claimer {}, citizen.claimStreak {}, citizen.longestClaimStreak {}',
+  if(enableLogs) log.info('handleUBIClaimed claimer {}, citizen.claimStreak {}, citizen.longestClaimStreak {}',
     [
       event.params.claimer.toHexString(),
       citizen.claimStreak.toString(),
@@ -315,27 +226,48 @@ function aggregateCitizenFromUBIClaimed(event: UBIClaimed, citizen: WalletStat |
 
 }
 
-function fixDailyUbiDaysCount(address: String, ubiScheme: UBIScheme, oldUBISchemeAddress: String, newUBISchemeAddress: String): BigInt {
-  let currentDay = ubiScheme.currentDay()
-  log.info('old currentDay {}, event.address.toHexString {}', [currentDay.toString(), address.toString()])
+let OLDUBI_PERIOD_START = BigInt.fromI32(1596195612)
+let NEWUBI_PERIOD_START = BigInt.fromI32(1612267200)
+let OLDUBI_LAST_DAY = BigInt.fromI32(186)
+const OLDUBI = '0xaacbaab8571cbeceb46ba85b5981efdb8928545e'
+const NEWUBI = '0xd7ac544f8a570c4d8764c3aabcf6870cbd960d0d'
 
-  // old ubi scheme and we are past the last day of old ubi
-  if (address == oldUBISchemeAddress && currentDay.gt(oldUbiLastDay)) {
-    log.info('oldUBISchemeAddress past last old ubi day returning {}', [address.toString()])
-    currentDay = BigInt.fromI32(-1)
+function getCurrentDay(address: String, eventTime: BigInt): BigInt{
+  let currentDay:BigInt
+  if (address == OLDUBI) {
+    currentDay = eventTime.minus(OLDUBI_PERIOD_START).div(BigInt.fromI32(60*60*24))
+    if(currentDay.gt(OLDUBI_LAST_DAY))
+      return BigInt.fromI32(-1)
+    return currentDay
   }
 
-  // we don't count new ubi scheme day 0
-  if (address == newUBISchemeAddress && currentDay.equals(ZERO)) {
-    log.info('newUBISchemeAddress day 0 returning {}', [address.toString()])
-    currentDay = BigInt.fromI32(-1)
-  }
-
-  // continue days count of new ubiScheme from where the last ubiScheme stopped
-  if (address == newUBISchemeAddress && currentDay.gt(ZERO)) {
-    currentDay = currentDay.plus(oldUbiLastDay)
-  }
-
-  log.info('new currentDay {}, address.toHexString {}', [currentDay.toString(), address.toString()])
+  currentDay = eventTime.minus(NEWUBI_PERIOD_START).div(BigInt.fromI32(60*60*24))
+  currentDay = currentDay.plus(OLDUBI_LAST_DAY)
   return currentDay
+
 }
+//depracated
+// function fixDailyUbiDaysCount(address: String, ubiScheme: UBIScheme, oldUBISchemeAddress: String, newUBISchemeAddress: String): BigInt {
+//   let currentDay = ubiScheme.currentDay()
+//   if(enableLogs) log.info('old currentDay {}, event.address.toHexString {}', [currentDay.toString(), address.toString()])
+
+//   // old ubi scheme and we are past the last day of old ubi
+//   if (address == oldUBISchemeAddress && currentDay.gt(oldUbiLastDay)) {
+//     if(enableLogs) log.info('oldUBISchemeAddress past last old ubi day returning {}', [address.toString()])
+//     currentDay = BigInt.fromI32(-1)
+//   }
+
+//   // we don't count new ubi scheme day 0
+//   if (address == newUBISchemeAddress && currentDay.equals(ZERO)) {
+//     if(enableLogs) log.info('newUBISchemeAddress day 0 returning {}', [address.toString()])
+//     currentDay = BigInt.fromI32(-1)
+//   }
+
+//   // continue days count of new ubiScheme from where the last ubiScheme stopped
+//   if (address == newUBISchemeAddress && currentDay.gt(ZERO)) {
+//     currentDay = currentDay.plus(oldUbiLastDay)
+//   }
+
+//   if(enableLogs) log.info('new currentDay {}, address.toHexString {}', [currentDay.toString(), address.toString()])
+//   return currentDay
+// }

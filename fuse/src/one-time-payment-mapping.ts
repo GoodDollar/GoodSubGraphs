@@ -7,9 +7,10 @@ import { fuse, fuse_mainnet, production, production_mainnet, staging, staging_ma
 
 // Change this according to working environment
 let contracts = production
+const enableLogs = false;
 
 export function handlePaymentWithdraw(event: PaymentWithdraw): void {
-  log.info('handlePaymentWithdraw from: {} to: {} paymentId: {} amount: {}', [
+  if(enableLogs) log.info('handlePaymentWithdraw from: {} to: {} paymentId: {} amount: {}', [
     event.params.from.toHexString(),
     event.params.to.toHexString(),
     event.params.paymentId.toHexString(),
@@ -21,8 +22,10 @@ export function handlePaymentWithdraw(event: PaymentWithdraw): void {
     let citizenTo = WalletStat.load(event.params.to.toHex())
     if (citizenTo == null) {
       citizenTo = new WalletStat(event.params.to.toHex())
+      citizenTo.dateAppeared = event.block.timestamp
     }
 
+    citizenTo.lastTransactionTo = event.block.timestamp 
     // citizenTo.inTransactionsCount = citizenTo.inTransactionsCount.plus(BigInt.fromI32(1))
     citizenTo.inTransactionsCountClean = citizenTo.inTransactionsCountClean.plus(BigInt.fromI32(1))
     citizenTo.inTransactionsValueClean = citizenTo.inTransactionsValueClean.plus(event.params.amount)
@@ -37,8 +40,10 @@ export function handlePaymentWithdraw(event: PaymentWithdraw): void {
     let citizenFrom = WalletStat.load(event.params.from.toHex())
     if (citizenFrom == null) {
       citizenFrom = new WalletStat(event.params.from.toHex())
+      citizenFrom.dateAppeared = event.block.timestamp
     }
 
+    citizenFrom.lastTransactionFrom = event.block.timestamp 
     // citizenFrom.outTransactionsCount = citizenFrom.outTransactionsCount.plus(BigInt.fromI32(1))
     citizenFrom.outTransactionsCountClean = citizenFrom.outTransactionsCountClean.plus(BigInt.fromI32(1))
 
@@ -56,13 +61,13 @@ export function handlePaymentWithdraw(event: PaymentWithdraw): void {
     let dayTimestamp = blockTimestamp - (blockTimestamp % (60 * 60 * 24))
     // remove .0 from string
     let dayTimestampStr = dayTimestamp.toString().split('.')[0]
-    log.info('got timestamp {}', [dayTimestampStr])
+    if(enableLogs) log.info('got timestamp {}', [dayTimestampStr])
     let statistics = TransactionStat.load(dayTimestampStr)
     if (statistics == null) {
       statistics = new TransactionStat(dayTimestampStr)
     }
 
-    // log.info('aggregated count:{} countClean:{} value:{} valueClean:{}, totalInCirculation:{}', [statistics.transactionsCount.toString(), statistics.transactionsCountClean.toString(), statistics.transactionsValue.toString(), statistics.transactionsValueClean.toString(), statistics.totalInCirculation.toString()])
+    if(enableLogs) log.info('aggregated count:{} countClean:{} value:{} valueClean:{}, totalInCirculation:{}', [statistics.transactionsCount.toString(), statistics.transactionsCountClean.toString(), statistics.transactionsValue.toString(), statistics.transactionsValueClean.toString(), statistics.totalInCirculation.toString()])
     statistics.transactionsCountClean = statistics.transactionsCountClean.plus(BigInt.fromI32(1))
     statistics.transactionsValueClean = statistics.transactionsValueClean.plus(event.params.amount)
 

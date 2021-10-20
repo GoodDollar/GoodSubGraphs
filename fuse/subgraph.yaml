@@ -14,46 +14,17 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - ActivatedUser
-        - InactiveUserFished
-        - OwnershipTransferred
-        - SchemeEnded
-        - SchemeStarted
-        - TotalFished
         - UBICalculated
         - UBIClaimed
         - UBICycleCalculated
-        - UBIEnded
-        - UBIStarted
-        - WithdrawFromDao
       abis:
         - name: UBIScheme
           file: ./node_modules/@gooddollar/goodcontracts/stakingModel/build/contracts/UBIScheme.json
       eventHandlers:
-        # - event: ActivatedUser(indexed address)
-        #   handler: handleActivatedUser
-        # - event: InactiveUserFished(indexed address,indexed address,uint256)
-        #   handler: handleInactiveUserFished
-        # - event: OwnershipTransferred(indexed address,indexed address)
-        #   handler: handleOwnershipTransferred
-        # - event: SchemeEnded(indexed address,uint256)
-        #   handler: handleSchemeEnded
-        # - event: SchemeStarted(indexed address,uint256)
-        #   handler: handleSchemeStarted
-        # - event: TotalFished(uint256)
-        #   handler: handleTotalFished
           - event: UBICalculated(uint256,uint256,uint256)
             handler: handleUBICalculated
           - event: UBIClaimed(indexed address,uint256)
             handler: handleUBIClaimed
-        # - event: UBICycleCalculated(uint256,uint256,uint256,uint256)
-        #   handler: handleUBICycleCalculated
-        # - event: UBIEnded(uint256,uint256)
-        #   handler: handleUBIEnded
-        # - event: UBIStarted(uint256,uint256)
-        #   handler: handleUBIStarted
-        # - event: WithdrawFromDao(uint256,uint256)
-        #   handler: handleWithdrawFromDao
       file: ./src/mapping.ts
 
   - kind: ethereum/contract
@@ -68,47 +39,20 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - ActivatedUser
-        - InactiveUserFished
-        - OwnershipTransferred
-        - SchemeEnded
-        - SchemeStarted
-        - TotalFished
         - UBICalculated
         - UBIClaimed
         - UBICycleCalculated
-        - UBIEnded
-        - UBIStarted
-        - WithdrawFromDao
+
       abis:
         - name: UBIScheme
           file: ./node_modules/@gooddollar/goodcontracts/stakingModel/build/contracts/UBIScheme.json
       eventHandlers:
-        # - event: ActivatedUser(indexed address)
-        #   handler: handleActivatedUser
-        # - event: InactiveUserFished(indexed address,indexed address,uint256)
-        #   handler: handleInactiveUserFished
-        # - event: OwnershipTransferred(indexed address,indexed address)
-        #   handler: handleOwnershipTransferred
-        # - event: SchemeEnded(indexed address,uint256)
-        #   handler: handleSchemeEnded
-        # - event: SchemeStarted(indexed address,uint256)
-        #   handler: handleSchemeStarted
-        # - event: TotalFished(uint256)
-        #   handler: handleTotalFished
           - event: UBICalculated(uint256,uint256,uint256)
             handler: handleUBICalculated
           - event: UBIClaimed(indexed address,uint256)
             handler: handleUBIClaimed
-        # - event: UBICycleCalculated(uint256,uint256,uint256,uint256)
-        #   handler: handleUBICycleCalculated
-        # - event: UBIEnded(uint256,uint256)
-        #   handler: handleUBIEnded
-        # - event: UBIStarted(uint256,uint256)
-        #   handler: handleUBIStarted
-        # - event: WithdrawFromDao(uint256,uint256)
-        #   handler: handleWithdrawFromDao
       file: ./src/mapping.ts
+
   - kind: ethereum/contract
     name: GoodDollar
     network: fuse
@@ -131,6 +75,7 @@ dataSources:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
       file: ./src/gd-mapping.ts
+
   - kind: ethereum/contract
     name: OneTimePayments
     network: fuse
@@ -151,6 +96,7 @@ dataSources:
         - event: PaymentWithdraw(indexed address,indexed address,indexed address,uint256)
           handler: handlePaymentWithdraw
       file: ./src/one-time-payment-mapping.ts
+
   - kind: ethereum/contract
     name: Identity
     network: fuse
