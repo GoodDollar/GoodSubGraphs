@@ -4,3 +4,4 @@ fuse/build
 fuse/generated
 mainnet/build
 mainnet/generated
+mainnet/docker/data

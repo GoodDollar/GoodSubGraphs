@@ -4,26 +4,26 @@ repository: https://github.com/GoodDollar/GoodSubGraphs
 schema:
   file: ./schema.graphql
 dataSources:
-  - kind: ethereum/contract
-    name: GoodDollar
-    network: mainnet
-    source:
-      address: '0x67C5870b4A41D4Ebef24d2456547A03F1f3e094B'
-      abi: GoodDollar
-      startBlock: 10591792
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      language: wasm/assemblyscript
-      entities:
-        - Transfer
-      abis:
-        - name: GoodDollar
-          file: ./abis/GoodDollar.json
-      eventHandlers:
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-      file: ./src/mapping.ts
+  # - kind: ethereum/contract
+  #   name: GoodDollar
+  #   network: mainnet
+  #   source:
+  #     address: '0x67C5870b4A41D4Ebef24d2456547A03F1f3e094B'
+  #     abi: GoodDollar
+  #     startBlock: 10699082
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.5
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - ReserveHistory
+  #     abis:
+  #       - name: GoodDollar
+  #         file: ./abis/GoodDollar.json
+  #     eventHandlers:
+  #       - event: Transfer(indexed address,indexed address,uint256)
+  #         handler: handleTransfer
+  #     file: ./src/mapping.ts
 
   - kind: ethereum/contract
     name: GoodMarketMaker
@@ -31,42 +31,57 @@ dataSources:
     source:
       address: '0xEDbE438Cd865992fDB72dd252E6055A71b02BE72'
       abi: GoodMarketMaker
-      startBlock: 10591792
+      startBlock: 10569404
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - BalancesUpdated
-        - UBIExpansionMinted
+        - ReserveHistory
       abis:
         - name: GoodMarketMaker
           file: ./abis/GoodMarketMaker.json
         - name: cToken
           file: ./abis/cERC20.json
+        - name: GoodReserveCDai
+          file: ./abis/GoodReserveCDai.json
+        - name: GoodMarketMaker
+          file: ./abis/GoodMarketMaker.json
+        - name: cToken
+          file: ./abis/cERC20.json      
+        - name: GoodDollar
+          file: ./abis/GoodDollar.json                 
       eventHandlers:
         - event: BalancesUpdated(indexed address,indexed address,uint256,uint256,uint256,uint256)
           handler: handleTokenSale
-        - event: UBIExpansionMinted(indexed address,indexed address,uint256,uint256,uint256)
-          handler: handleExpansion
       file: ./src/mapping.ts
 
   - kind: ethereum/contract
     name: GoodReserveCDai
     network: mainnet
     source:
-      address: '0xEDbE438Cd865992fDB72dd252E6055A71b02BE72'
+      address: '0x5C16960F2Eeba27b7de4F1F6e84E616C1977e070'
       abi: GoodReserveCDai
-      startBlock: 10591792
+      startBlock:  10569404
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - UBIMinted
+        - ReserveHistory
       abis:
+        - name: GoodMarketMaker
+          file: ./abis/GoodMarketMaker.json
+        - name: cToken
+          file: ./abis/cERC20.json
         - name: GoodReserveCDai
           file: ./abis/GoodReserveCDai.json
+        - name: GoodMarketMaker
+          file: ./abis/GoodMarketMaker.json
+        - name: cToken
+          file: ./abis/cERC20.json      
+        - name: GoodDollar
+          file: ./abis/GoodDollar.json      
       eventHandlers:
         - event: UBIMinted(indexed uint256,indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleUBIMinted
