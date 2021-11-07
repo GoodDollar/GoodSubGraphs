@@ -1,19 +1,10 @@
 import { BigInt, log, Address } from '@graphprotocol/graph-ts'
 import {
-  // Contract,
-  Approval,
-  MinterAdded,
-  MinterRemoved,
-  OwnershipTransferred,
-  Paused,
-  PauserAdded,
-  PauserRemoved,
   Transfer,
-  Unpaused,
 } from '../generated/GoodDollar/GoodDollar'
 import { GlobalStatistics, TransactionStat, WalletStat } from '../generated/schema'
 
-import { fuse, fuse_mainnet, production, production_mainnet, staging, staging_mainnet, test, develop } from '../scripts/releases'
+import { production } from '../scripts/releases'
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 let ZERO = BigInt.fromI32(0)
@@ -53,6 +44,7 @@ export function handleTransfer(event: Transfer): void {
     dailyStatistics.dayStartBlockNumber = event.block.number
   }
   aggregateTransactionStatFromTransfer(event, dailyStatistics)
+  
   aggregateCitizenFromTransfer(event)
 
 }

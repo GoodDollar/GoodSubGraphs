@@ -17,8 +17,16 @@ services:
       postgres_pass: let-me-in
       postgres_db: graph-node
       ipfs: 'ipfs:5001'
-      ethereum: 'mainnet:https://explorer-node.fuse.io/'
-      RUST_LOG: info
+      ethereum: 'fuse:https://explorer-node.fuse.io/'
+      # ethereum: 'mainnet:https://:d57939c260bdf0a6f22550e2350b4312@fuse-archival.gateway.pokt.network/v1/lb/60ee374fc6318362996a1fb0'
+      # ethereum: 'mainnet:https://oefusefull1.liquify.info/'
+      GRAPH_LOG: info
+      GRAPH_ETHEREUM_TARGET_TRIGGERS_PER_BLOCK_RANGE: 5000
+      GRAPH_ETHEREUM_MAX_BLOCK_RANGE_SIZE: 2000
+      ETHEREUM_BLOCK_BATCH_SIZE: 2000
+
+      # GRAPH_ETHEREUM_MAX_BLOCK_RANGE_SIZE: 1000
+      # GRAPH_ETHEREUM_MAX_EVENT_ONLY_RANGE: 10000
   ipfs:
     image: ipfs/go-ipfs:v0.4.23
     ports:
