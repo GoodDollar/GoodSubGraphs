@@ -14,8 +14,9 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - UBICalculated
-        - UBIClaimed
+        - DailyUBI
+        - WalletStat
+        - GlobalStatistics
       abis:
         - name: UBIScheme
           file: ./node_modules/@gooddollar/goodcontracts/stakingModel/build/contracts/UBIScheme.json
@@ -32,16 +33,16 @@ dataSources:
     source:
       address: '0xD7aC544F8A570C4d8764c3AAbCF6870CBD960D0D'
       abi: UBIScheme
-      startBlock: 9376522
+      startBlock: 1076522
+      # startBlock: 13760094
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - UBICalculated
-        - UBIClaimed
-        - UBICycleCalculated
-
+        - DailyUBI
+        - WalletStat
+        - GlobalStatistics
       abis:
         - name: UBIScheme
           file: ./node_modules/@gooddollar/goodcontracts/stakingModel/build/contracts/UBIScheme.json
@@ -52,6 +53,10 @@ dataSources:
             handler: handleUBICycleCalculated
           - event: UBIClaimed(indexed address,uint256)
             handler: handleUBIClaimed
+          - event: ActivatedUser(indexed address)
+            handler: handleActivatedUser
+          - event: InactiveUserFished(indexed address,indexed address,uint256)
+            handler: handleFishedUser
       file: ./src/mapping.ts
 
   - kind: ethereum/contract
@@ -66,9 +71,9 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - Citizen
-        - TransactionStatistics
-        - Transfer
+        - GlobalStatistics
+        - TransactionStat
+        - WalletStat
       abis:
         - name: GoodDollar
           file: ./node_modules/@gooddollar/goodcontracts/build/contracts/GoodDollar.json
@@ -89,7 +94,9 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - Citizen
+        - GlobalStatistics
+        - TransactionStat
+        - WalletStat
       abis:
         - name: OneTimePayments
           file: ./node_modules/@gooddollar/goodcontracts/build/contracts/OneTimePayments.json
@@ -105,6 +112,8 @@ dataSources:
       address: '0xFa8d865A962ca8456dF331D78806152d3aC5B84F'
       abi: Identity
       startBlock: 6246324
+      # startBlock: 13760094
+
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
