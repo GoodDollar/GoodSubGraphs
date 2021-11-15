@@ -20,6 +20,8 @@ dataSources:
       abis:
         - name: UBIScheme
           file: ./node_modules/@gooddollar/goodcontracts/stakingModel/build/contracts/UBIScheme.json
+        - name: GoodDollar
+          file: ./node_modules/@gooddollar/goodcontracts/build/contracts/GoodDollar.json
       eventHandlers:
           - event: UBICalculated(uint256,uint256,uint256)
             handler: handleUBICalculated
@@ -34,7 +36,6 @@ dataSources:
       address: '0xD7aC544F8A570C4d8764c3AAbCF6870CBD960D0D'
       abi: UBIScheme
       startBlock: 1076522
-      # startBlock: 13760094
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -46,11 +47,11 @@ dataSources:
       abis:
         - name: UBIScheme
           file: ./node_modules/@gooddollar/goodcontracts/stakingModel/build/contracts/UBIScheme.json
+        - name: GoodDollar
+          file: ./node_modules/@gooddollar/goodcontracts/build/contracts/GoodDollar.json
       eventHandlers:
           - event: UBICalculated(uint256,uint256,uint256)
             handler: handleUBICalculated
-          - event: UBICycleCalculated(uint256,uint256,uint256,uint256)
-            handler: handleUBICycleCalculated
           - event: UBIClaimed(indexed address,uint256)
             handler: handleUBIClaimed
           - event: ActivatedUser(indexed address)
@@ -112,8 +113,6 @@ dataSources:
       address: '0xFa8d865A962ca8456dF331D78806152d3aC5B84F'
       abi: Identity
       startBlock: 6246324
-      # startBlock: 13760094
-
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
