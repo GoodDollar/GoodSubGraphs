@@ -10,8 +10,28 @@ type ReserveHistory @entity {
   reserveRatio: BigDecimal
   reserveValueInDAI: BigDecimal
   totalSupply: BigInt
-  ubiMintedFromExpansion: BigDecimal
-  ubiMintedFromInterest: BigDecimal
-  interestReceivedCDAI: BigDecimal
-  interestReceivedDAI: BigDecimal
+  ubiMintedFromExpansion: BigDecimal!
+  ubiMintedFromInterest: BigDecimal!
+  interestReceivedCDAI: BigDecimal!
+  interestReceivedDAI: BigDecimal!
+}
+
+type StakeHistory @entity {
+  id: ID!
+  totalUSDStaked: BigDecimal!
+  stakingContracts: [ContractStakeHistory!]!
+}
+
+type ContractStakeHistory @entity {
+  id: ID!
+  totalUSDStaked: BigDecimal!
+  totalTokenStaked: BigDecimal!
+  supporters:[Supporter!]!
+  opValue: [BigDecimal!]!
+}
+
+type Supporter @entity {
+  id: ID!
+  totalUSDStaked: BigDecimal!
+  stakingContracts:  [ContractStakeHistory!]! @derivedFrom(field: "supporters")
 }

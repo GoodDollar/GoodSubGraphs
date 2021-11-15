@@ -86,3 +86,28 @@ dataSources:
         - event: UBIMinted(indexed uint256,indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleUBIMinted
       file: ./src/mapping.ts
+
+  - kind: ethereum/contract 
+    name: SimpleDAIStaking
+    network: mainnet
+    source:
+      address: '0xEa12bB3917cf6aE2FDE97cE4756177703426d41F'
+      abi: SimpleDAIStaking
+      startBlock:  10569404
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - StakingHistory
+      abis:        
+        - name: cToken
+          file: ./abis/cERC20.json    
+        - name: SimpleDAIStaking
+          file: ./abis/SimpleDAIStaking.json            
+      eventHandlers:
+        - event: DAIStaked(indexed address,uint256)
+          handler: handleStake
+        - event: DAIStakeWithdraw(indexed address,uint256,uint256)
+          handler: handleStakeWithdraw
+      file: ./src/mapping.ts
