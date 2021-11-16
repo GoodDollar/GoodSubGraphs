@@ -4,7 +4,7 @@ import { GoodMarketMaker, BalancesUpdated } from '../generated/GoodMarketMaker/G
 import { UBIMinted } from '../generated/GoodReserveCDai/GoodReserveCDai'
 import { cToken } from '../generated/GoodMarketMaker/cToken'
 import { DAIStakeWithdraw, DAIStaked } from '../generated/SimpleDAIStaking/SimpleDAIStaking'
-import { ReserveHistory, Supporter, ContractStakeHistory, StakeHistory } from '../generated/schema'
+import { ReserveHistory, Supporter, ContractStakeHistory, StakeHistory, StakeStatistic } from '../generated/schema'
 
 let e18 = BigInt.fromString('1000000000000000000')
 let e8 = BigInt.fromString('100000000')
@@ -125,25 +125,50 @@ function _updateReserveHistory(blockTimestamp: BigInt, blockNumber: BigInt, ubim
 }
 
 export function handleStake(event: DAIStaked): void {
-  _handleStakeOperation(event.block.timestamp, event.params.staker, event.params.daiValue.toBigDecimal()) 
+  let tokenValue = event.params.daiValue.toBigDecimal().div(e18.toBigDecimal())
+
+  _handleStakeOperation(event.block.timestamp,event.address, event.params.staker, tokenValue, tokenValue)  //tokenvalue = usdvalue
 }
 
 export function handleStakeWithdraw(event:DAIStakeWithdraw): void {
-  _handleStakeOperation(event.block.timestamp, event.params.staker, event.params.daiActual.toBigDecimal().neg())
+  let tokenValue = event.params.daiActual.toBigDecimal().div(e18.toBigDecimal()).neg();
+  _handleStakeOperation(event.block.timestamp,event.address, event.params.staker,tokenValue,tokenValue ) //tokenvalue = usd value
 }
 
-function _handleStakeOperation(blockTimestamp:BigInt, staker:Address, value: BigDecimal): void {
+function _handleStakeOperation(blockTimestamp:BigInt,contract:Address, staker:Address, tokenValue: BigDecimal, usdValue: BigDecimal): void {
   let dayTimestamp = blockTimestamp.minus(blockTimestamp.mod(BigInt.fromI32(60 * 60 * 24)))
-  log.debug('handleStake got timestamp {} staker: {} value: {}', [blockTimestamp.toString(), staker.toHexString(), value.toString()])
+  log.debug('handleStake got timestamp {} staker: {} value: {}', [blockTimestamp.toString(), staker.toHexString(), tokenValue.toString()])
   //initialize entities
   let contractHistory = ContractStakeHistory.load(dayTimestamp.toString())
   if(contractHistory == null)
   {
-    contractHistory = new ContractStakeHistory(dayTimestamp.toString())
+    contractHistory = new ContractStakeHistory(contract.toHexString() + '_' + dayTimestamp.toString())
     contractHistory.totalTokenStaked = BigDecimal.zero()
     contractHistory.totalUSDStaked = BigDecimal.zero()    
-
+    contractHistory.contract = contract.toHexString()
+    contractHistory.day = dayTimestamp
   }
+
+  let stakeStats = StakeStatistic.load('global')
+  if(stakeStats == null) {
+    stakeStats = new StakeStatistic('global')
+    stakeStats.totalUSDStaked = BigDecimal.zero()
+    stakeStats.totalTokenStaked = BigDecimal.zero()
+  }
+  stakeStats.totalTokenStaked = stakeStats.totalTokenStaked.plus(tokenValue)
+  stakeStats.totalUSDStaked = stakeStats.totalUSDStaked.plus(usdValue)
+  stakeStats.save()
+
+  let contractStats = StakeStatistic.load(contract.toHexString())
+  if(contractStats == null) {
+    contractStats = new StakeStatistic(contract.toHexString())
+    contractStats.totalUSDStaked = BigDecimal.zero()
+    contractStats.totalTokenStaked = BigDecimal.zero()
+  }
+  contractStats.totalTokenStaked = contractStats.totalTokenStaked.plus(tokenValue)
+  contractStats.totalUSDStaked = contractStats.totalUSDStaked.plus(usdValue)
+  contractStats.save()
+
   let stakingHistory = StakeHistory.load(dayTimestamp.toString())
   if(stakingHistory == null)
   {
@@ -167,22 +192,21 @@ function _handleStakeOperation(blockTimestamp:BigInt, staker:Address, value: Big
     stakingHistory.stakingContracts = c;
   }
 
-  const tokenStaked = value.div(e18.toBigDecimal());
 
-  stakingHistory.totalUSDStaked = stakingHistory.totalUSDStaked.plus(tokenStaked)
+  stakingHistory.totalUSDStaked = stakingHistory.totalUSDStaked.plus(usdValue)
 
-  contractHistory.totalTokenStaked = contractHistory.totalTokenStaked.plus(tokenStaked)
-  contractHistory.totalUSDStaked = contractHistory.totalUSDStaked.plus(tokenStaked)  
+  contractHistory.totalTokenStaked = contractHistory.totalTokenStaked.plus(tokenValue)
+  contractHistory.totalUSDStaked = contractHistory.totalUSDStaked.plus(usdValue)  
 
   let s = contractHistory.supporters
   s.push(supporter.id)
   contractHistory.supporters = s;
   
-  let ops = contractHistory.opValue
-  ops.push(tokenStaked)
-  contractHistory.opValue = ops
-  
-  supporter.totalUSDStaked = supporter.totalUSDStaked.plus(tokenStaked)
+  let ops = contractHistory.opValues
+  ops.push(tokenValue)
+  contractHistory.opValues = ops  
+
+  supporter.totalUSDStaked = supporter.totalUSDStaked.plus(tokenValue)
 
   supporter.save()
   stakingHistory.save()

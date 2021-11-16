@@ -24,10 +24,12 @@ type StakeHistory @entity {
 
 type ContractStakeHistory @entity {
   id: ID!
+  day: BigInt!
+  contract: StakeStatistic!
   totalUSDStaked: BigDecimal!
   totalTokenStaked: BigDecimal!
   supporters:[Supporter!]!
-  opValue: [BigDecimal!]!
+  opValues: [BigDecimal!]!
 }
 
 type Supporter @entity {
@@ -35,3 +37,11 @@ type Supporter @entity {
   totalUSDStaked: BigDecimal!
   stakingContracts:  [ContractStakeHistory!]! @derivedFrom(field: "supporters")
 }
+
+type StakeStatistic @entity {
+  id: ID!
+  totalUSDStaked: BigDecimal!
+  totalTokenStaked: BigDecimal!
+  contractStakeHistory:  [ContractStakeHistory!] @derivedFrom(field: "contract")
+}
+
