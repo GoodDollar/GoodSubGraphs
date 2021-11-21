@@ -271,6 +271,7 @@ function handleActiveUser(user: Address, isActive: boolean): void {
   
   let citizen = WalletStat.load(user.toHexString())
   citizen.isActiveUser = isActive;
+  citizen.save()
 
 }
 
