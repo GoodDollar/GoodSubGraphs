@@ -2,8 +2,13 @@ import { BigInt, log, BigDecimal, Address } from '@graphprotocol/graph-ts'
 import { GoodDollar } from '../generated/GoodReserveCDai/GoodDollar'
 import { GoodMarketMaker, BalancesUpdated } from '../generated/GoodMarketMaker/GoodMarketMaker'
 import { UBIMinted } from '../generated/GoodReserveCDai/GoodReserveCDai'
+import { UBIMinted as UBIMintedV2 } from '../generated/GoodReserveCDaiV2/GoodReserveCDaiV2'
+import {  BalancesUpdated as BalancesUpdatedV2 } from '../generated/GoodMarketMakerV2/GoodMarketMakerV2'
+
 import { cToken } from '../generated/GoodMarketMaker/cToken'
 import { DAIStakeWithdraw, DAIStaked } from '../generated/SimpleDAIStaking/SimpleDAIStaking'
+import { Staked, StakeWithdraw } from '../generated/SimpleStakingAaveUSDC/SimpleStaking'
+
 import { ReserveHistory, Supporter, ContractStakeHistory, StakeHistory, StakeStatistic } from '../generated/schema'
 
 let e18 = BigInt.fromString('1000000000000000000')
@@ -14,24 +19,32 @@ let e8 = BigInt.fromString('100000000')
 
 
 // }
-
 export function handleUBIMinted(event: UBIMinted): void {
   // log.info('handleUBIMinted got timestamp',[])
-  _updateReserveHistory(event.block.timestamp, event.block.number, event)
+  _updateReserveHistory(event.block.timestamp, event.block.number,Address.fromString("0xEDbE438Cd865992fDB72dd252E6055A71b02BE72"), event.params.interestReceived, event.params.gdExpansionMinted, event.params.gdInterestMinted)
+}
+
+export function handleUBIMintedV2(event: UBIMintedV2): void {
+  // log.info('handleUBIMinted got timestamp',[])
+  _updateReserveHistory(event.block.timestamp, event.block.number,Address.fromString("0x30D37B05cF73Edd8c59ce8450F093f6C06dA9272"), event.params.interestReceived, event.params.gdExpansionMinted, event.params.gdInterestMinted)
 }
 
 export function handleTokenSale(event: BalancesUpdated): void {
   // log.info('handleTokenSale got timestamp', [])
-  _updateReserveHistory(event.block.timestamp, event.block.number)
+  _updateReserveHistory(event.block.timestamp, event.block.number,Address.fromString("0xEDbE438Cd865992fDB72dd252E6055A71b02BE72"))
+}
 
+export function handleTokenSaleV2(event: BalancesUpdatedV2): void {
+  // log.info('handleTokenSale got timestamp', [])
+  _updateReserveHistory(event.block.timestamp, event.block.number,Address.fromString("0x30D37B05cF73Edd8c59ce8450F093f6C06dA9272"))
 }
 
 //collects price + reserve data
 //each ReserveHistory record holds the last update for that day
-function _updateReserveHistory(blockTimestamp: BigInt, blockNumber: BigInt, ubimintedEvent: UBIMinted | null = null): void {
+function _updateReserveHistory(blockTimestamp: BigInt, blockNumber: BigInt,marketMaker: Address, interestReceived: BigInt | null = null, gdExpansionMinted: BigInt | null = null, gdInterestMinted: BigInt | null = null): void {
   let reserveToken = Address.fromString('0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643') //cdai mainnet
   let tokenContract = GoodDollar.bind(Address.fromString('0x67C5870b4A41D4Ebef24d2456547A03F1f3e094B')) //g$ mainnet
-  let reserveContract = GoodMarketMaker.bind(Address.fromString("0xEDbE438Cd865992fDB72dd252E6055A71b02BE72"))
+  let reserveContract = GoodMarketMaker.bind(marketMaker)
   let curPrice = reserveContract.currentPrice(reserveToken)
   let cdaiContract = cToken.bind(reserveToken)
 
@@ -68,13 +81,13 @@ function _updateReserveHistory(blockTimestamp: BigInt, blockNumber: BigInt, ubim
     .times(curPrice)
     .div(e18) //return price in dai wei
 
-  if(ubimintedEvent != null) {
-    reserveHistory.ubiMintedFromExpansion = reserveHistory.ubiMintedFromExpansion.plus(ubimintedEvent.params.gdExpansionMinted.toBigDecimal().div(BigInt.fromI32(100).toBigDecimal()))
-    reserveHistory.ubiMintedFromInterest = reserveHistory.ubiMintedFromInterest.plus(ubimintedEvent.params.gdInterestMinted.toBigDecimal().div(BigInt.fromI32(100).toBigDecimal()));
-    reserveHistory.interestReceivedCDAI = reserveHistory.interestReceivedCDAI.plus(ubimintedEvent.params.interestReceived.toBigDecimal().div(e8.toBigDecimal()));
+  if(gdExpansionMinted && gdInterestMinted && interestReceived) {
+    reserveHistory.ubiMintedFromExpansion = reserveHistory.ubiMintedFromExpansion.plus(gdExpansionMinted.toBigDecimal().div(BigInt.fromI32(100).toBigDecimal()))
+    reserveHistory.ubiMintedFromInterest = reserveHistory.ubiMintedFromInterest.plus(gdInterestMinted.toBigDecimal().div(BigInt.fromI32(100).toBigDecimal()));
+    reserveHistory.interestReceivedCDAI = reserveHistory.interestReceivedCDAI.plus(interestReceived.toBigDecimal().div(e8.toBigDecimal()));
     reserveHistory.interestReceivedDAI = reserveHistory.interestReceivedDAI.plus(cdaiContract
     .exchangeRateStored()
-    .times(ubimintedEvent.params.interestReceived)
+    .times(interestReceived)
     .div(e18).toBigDecimal().div(e18.toBigDecimal()))
   }
   
@@ -132,6 +145,32 @@ export function handleStake(event: DAIStaked): void {
 
 export function handleStakeWithdraw(event:DAIStakeWithdraw): void {
   let tokenValue = event.params.daiActual.toBigDecimal().div(e18.toBigDecimal()).neg();
+  _handleStakeOperation(event.block.timestamp,event.address, event.params.staker,tokenValue,tokenValue ) //tokenvalue = usd value
+}
+
+export function handleStakeV2(event: Staked): void {
+  let divider:BigDecimal = e18.toBigDecimal()
+  const addr = event.address.toHexString()
+
+  if(addr == "0x589ceb6cA1112f7aCCA19930b47871c5A259B0fC"){
+    //usdc 6 decimals staking contract
+    divider = BigDecimal.fromString("1000000")
+  }
+
+  let tokenValue = event.params.value.toBigDecimal().div(divider)
+
+  _handleStakeOperation(event.block.timestamp,event.address, event.params.staker, tokenValue, tokenValue)  //tokenvalue = usdvalue
+}
+
+export function handleStakeWithdrawV2(event:StakeWithdraw): void {
+  let divider:BigDecimal = e18.toBigDecimal()
+  const addr = event.address.toHexString()
+  
+  if(addr == "0x589ceb6cA1112f7aCCA19930b47871c5A259B0fC") {//usdc 6 decimals staking contract
+      divider = BigDecimal.fromString("1000000")
+  }
+
+  let tokenValue = event.params.value.toBigDecimal().div(divider).neg();
   _handleStakeOperation(event.block.timestamp,event.address, event.params.staker,tokenValue,tokenValue ) //tokenvalue = usd value
 }
 
