@@ -59,6 +59,38 @@ dataSources:
           - event: InactiveUserFished(indexed address,indexed address,uint256)
             handler: handleFishedUser
       file: ./src/mapping.ts
+      
+  - kind: ethereum/contract
+    name: UBISchemeV2
+    network: fuse
+    source:
+      address: '0x87d77A30a6819860eB8332D293810ed7b510035A'
+      abi: UBIScheme
+      startBlock: 14149739
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - DailyUBI
+        - WalletStat
+        - GlobalStatistics
+      abis:
+        - name: UBIScheme
+          file: ./node_modules/@gooddollar/goodcontracts/stakingModel/build/contracts/UBIScheme.json
+        - name: GoodDollar
+          file: ./node_modules/@gooddollar/goodcontracts/build/contracts/GoodDollar.json
+      eventHandlers:
+          - event: UBICalculated(uint256,uint256,uint256)
+            handler: handleUBICalculated
+          - event: UBIClaimed(indexed address,uint256)
+            handler: handleUBIClaimed
+          - event: ActivatedUser(indexed address)
+            handler: handleActivatedUser
+          - event: InactiveUserFished(indexed address,indexed address,uint256)
+            handler: handleFishedUser
+      file: ./src/mapping.ts
+
 
   - kind: ethereum/contract
     name: GoodDollar

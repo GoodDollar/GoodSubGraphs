@@ -57,7 +57,7 @@ export function handleUBICalculated(event: UBICalculated): void {
   dailyUbi.quota = quota
   dailyUbi.activeUsers = activeUsers
   dailyUbi.timestamp = event.block.timestamp
-  if(event.address.toHexString() == NEWUBI)
+  if(event.address.toHexString() != OLDUBI)
   {
     dailyUbi.cycleLength = ubiScheme.cycleLength()
     dailyUbi.dayInCycle = ubiScheme.currentDayInCycle()
