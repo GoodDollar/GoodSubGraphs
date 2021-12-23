@@ -3,7 +3,6 @@ import { GoodDollar } from '../generated/GoodReserveCDai/GoodDollar'
 import { GoodMarketMaker, BalancesUpdated } from '../generated/GoodMarketMaker/GoodMarketMaker'
 import { UBIMinted } from '../generated/GoodReserveCDai/GoodReserveCDai'
 import { UBIMinted as UBIMintedV2 } from '../generated/GoodReserveCDaiV2/GoodReserveCDaiV2'
-import {  BalancesUpdated as BalancesUpdatedV2 } from '../generated/GoodMarketMakerV2/GoodMarketMakerV2'
 
 import { cToken } from '../generated/GoodMarketMaker/cToken'
 import { DAIStakeWithdraw, DAIStaked } from '../generated/SimpleDAIStaking/SimpleDAIStaking'
@@ -21,29 +20,29 @@ let e8 = BigInt.fromString('100000000')
 // }
 export function handleUBIMinted(event: UBIMinted): void {
   // log.info('handleUBIMinted got timestamp',[])
-  _updateReserveHistory(event.block.timestamp, event.block.number,Address.fromString("0xEDbE438Cd865992fDB72dd252E6055A71b02BE72"), event.params.interestReceived, event.params.gdExpansionMinted, event.params.gdInterestMinted)
+  _updateReserveHistory(event.block.timestamp, event.block.number,Address.fromString("0xedbe438cd865992fdb72dd252e6055a71b02be72"), event.params.interestReceived, event.params.gdExpansionMinted, event.params.gdInterestMinted)
 }
 
 export function handleUBIMintedV2(event: UBIMintedV2): void {
   // log.info('handleUBIMinted got timestamp',[])
-  _updateReserveHistory(event.block.timestamp, event.block.number,Address.fromString("0x30D37B05cF73Edd8c59ce8450F093f6C06dA9272"), event.params.interestReceived, event.params.gdExpansionMinted, event.params.gdInterestMinted)
+  _updateReserveHistory(event.block.timestamp, event.block.number,Address.fromString("0x30d37b05cf73edd8c59ce8450f093f6c06da9272"), event.params.interestReceived, event.params.gdExpansionMinted, event.params.gdInterestMinted)
 }
 
 export function handleTokenSale(event: BalancesUpdated): void {
   // log.info('handleTokenSale got timestamp', [])
-  _updateReserveHistory(event.block.timestamp, event.block.number,Address.fromString("0xEDbE438Cd865992fDB72dd252E6055A71b02BE72"))
+  _updateReserveHistory(event.block.timestamp, event.block.number,Address.fromString("0xedbe438cd865992fdb72dd252e6055a71b02be72"))
 }
 
-export function handleTokenSaleV2(event: BalancesUpdatedV2): void {
+export function handleTokenSaleV2(event: BalancesUpdated): void {
   // log.info('handleTokenSale got timestamp', [])
-  _updateReserveHistory(event.block.timestamp, event.block.number,Address.fromString("0x30D37B05cF73Edd8c59ce8450F093f6C06dA9272"))
+  _updateReserveHistory(event.block.timestamp, event.block.number,Address.fromString("0x30d37b05cf73edd8c59ce8450f093f6c06da9272"))
 }
 
 //collects price + reserve data
 //each ReserveHistory record holds the last update for that day
 function _updateReserveHistory(blockTimestamp: BigInt, blockNumber: BigInt,marketMaker: Address, interestReceived: BigInt | null = null, gdExpansionMinted: BigInt | null = null, gdInterestMinted: BigInt | null = null): void {
-  let reserveToken = Address.fromString('0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643') //cdai mainnet
-  let tokenContract = GoodDollar.bind(Address.fromString('0x67C5870b4A41D4Ebef24d2456547A03F1f3e094B')) //g$ mainnet
+  let reserveToken = Address.fromString('0x5d3a536e4d6dbd6114cc1ead35777bab948e3643') //cdai mainnet
+  let tokenContract = GoodDollar.bind(Address.fromString('0x67c5870b4a41d4ebef24d2456547a03f1f3e094b')) //g$ mainnet
   let reserveContract = GoodMarketMaker.bind(marketMaker)
   let curPrice = reserveContract.currentPrice(reserveToken)
   let cdaiContract = cToken.bind(reserveToken)
@@ -152,7 +151,7 @@ export function handleStakeV2(event: Staked): void {
   let divider:BigDecimal = e18.toBigDecimal()
   const addr = event.address.toHexString()
 
-  if(addr == "0x589ceb6cA1112f7aCCA19930b47871c5A259B0fC"){
+  if(addr == "0x589ceb6ca1112f7acca19930b47871c5a259b0fc"){
     //usdc 6 decimals staking contract
     divider = BigDecimal.fromString("1000000")
   }
@@ -166,7 +165,7 @@ export function handleStakeWithdrawV2(event:StakeWithdraw): void {
   let divider:BigDecimal = e18.toBigDecimal()
   const addr = event.address.toHexString()
   
-  if(addr == "0x589ceb6cA1112f7aCCA19930b47871c5A259B0fC") {//usdc 6 decimals staking contract
+  if(addr == "0x589ceb6ca1112f7acca19930b47871c5a259b0fc") {//usdc 6 decimals staking contract
       divider = BigDecimal.fromString("1000000")
   }
 
@@ -232,10 +231,10 @@ function _handleStakeOperation(blockTimestamp:BigInt,contract:Address, staker:Ad
   }
 
 
-  stakingHistory.totalUSDStaked = stakingHistory.totalUSDStaked.plus(usdValue)
+  stakingHistory.totalUSDStaked = stakeStats.totalUSDStaked.plus(usdValue)
 
-  contractHistory.totalTokenStaked = contractHistory.totalTokenStaked.plus(tokenValue)
-  contractHistory.totalUSDStaked = contractHistory.totalUSDStaked.plus(usdValue)  
+  contractHistory.totalTokenStaked = contractStats.totalTokenStaked.plus(tokenValue)
+  contractHistory.totalUSDStaked = contractStats.totalUSDStaked.plus(usdValue)  
 
   let s = contractHistory.supporters
   s.push(supporter.id)

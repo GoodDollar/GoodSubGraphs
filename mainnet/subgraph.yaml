@@ -59,7 +59,7 @@ dataSources:
     network: mainnet
     source:
       address: '0x30D37B05cF73Edd8c59ce8450F093f6C06dA9272'
-      abi: GoodMarketMakerV2
+      abi: GoodMarketMaker
       startBlock: 13835700
     mapping:
       kind: ethereum/events
@@ -68,12 +68,12 @@ dataSources:
       entities:
         - ReserveHistory
       abis:
-        - name: GoodMarketMakerV2
-          file: ./abis/GoodMarketMakerV2.json
+        - name: GoodMarketMaker
+          file: ./abis/GoodMarketMaker.json
         - name: cToken
           file: ./abis/cERC20.json
-        - name: GoodReserveCDaiV2
-          file: ./abis/GoodReserveCDaiV2.json
+        - name: GoodReserveCDai
+          file: ./abis/GoodReserveCDai.json
         - name: cToken
           file: ./abis/cERC20.json      
         - name: GoodDollar
@@ -128,10 +128,12 @@ dataSources:
       abis:
         - name: cToken
           file: ./abis/cERC20.json
+        - name: GoodReserveCDai
+          file: ./abis/GoodReserveCDai.json
         - name: GoodReserveCDaiV2
           file: ./abis/GoodReserveCDaiV2.json
-        - name: GoodMarketMakerV2
-          file: ./abis/GoodMarketMakerV2.json
+        - name: GoodMarketMaker
+          file: ./abis/GoodMarketMaker.json
         - name: cToken
           file: ./abis/cERC20.json      
         - name: GoodDollar
@@ -195,7 +197,7 @@ dataSources:
     name: SimpleStakingAaveUSDC
     network: mainnet
     source:
-      address: '0xD33bA17C8A644C585089145e86E282fada6F3bfd'
+      address: '0x589ceb6cA1112f7aCCA19930b47871c5A259B0fC'
       abi: SimpleStaking
       startBlock:  13835700
     mapping:
