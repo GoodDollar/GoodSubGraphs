@@ -177,7 +177,7 @@ function _handleStakeOperation(blockTimestamp:BigInt,contract:Address, staker:Ad
   let dayTimestamp = blockTimestamp.minus(blockTimestamp.mod(BigInt.fromI32(60 * 60 * 24)))
   log.debug('handleStake got timestamp {} staker: {} value: {}', [blockTimestamp.toString(), staker.toHexString(), tokenValue.toString()])
   //initialize entities
-  let contractHistory = ContractStakeHistory.load(dayTimestamp.toString())
+  let contractHistory = ContractStakeHistory.load(contract.toHexString() + '_' + dayTimestamp.toString())
   if(contractHistory == null)
   {
     contractHistory = new ContractStakeHistory(contract.toHexString() + '_' + dayTimestamp.toString())
@@ -231,10 +231,10 @@ function _handleStakeOperation(blockTimestamp:BigInt,contract:Address, staker:Ad
   }
 
 
-  stakingHistory.totalUSDStaked = stakeStats.totalUSDStaked.plus(usdValue)
+  stakingHistory.totalUSDStaked = stakeStats.totalUSDStaked
 
-  contractHistory.totalTokenStaked = contractStats.totalTokenStaked.plus(tokenValue)
-  contractHistory.totalUSDStaked = contractStats.totalUSDStaked.plus(usdValue)  
+  contractHistory.totalTokenStaked = contractStats.totalTokenStaked
+  contractHistory.totalUSDStaked = contractStats.totalUSDStaked
 
   let s = contractHistory.supporters
   s.push(supporter.id)
@@ -244,7 +244,7 @@ function _handleStakeOperation(blockTimestamp:BigInt,contract:Address, staker:Ad
   ops.push(tokenValue)
   contractHistory.opValues = ops  
 
-  supporter.totalUSDStaked = supporter.totalUSDStaked.plus(tokenValue)
+  supporter.totalUSDStaked = supporter.totalUSDStaked.plus(usdValue)
 
   supporter.save()
   stakingHistory.save()
