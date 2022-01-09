@@ -34,6 +34,7 @@ function aggregateDailyStats(event: PaymentWithdraw):void {
   let statistics = TransactionStat.load(dayTimestampStr)
   if (statistics == null) {
     statistics = new TransactionStat(dayTimestampStr)
+    statistics.dayStartBlockNumber = event.block.number
   }
 
   if(enableLogs) log.info('aggregated count:{} countClean:{} value:{} valueClean:{}, totalInCirculation:{}', [statistics.transactionsCount.toString(), statistics.transactionsCountClean.toString(), statistics.transactionsValue.toString(), statistics.transactionsValueClean.toString(), statistics.totalInCirculation.toString()])
