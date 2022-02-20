@@ -58,3 +58,20 @@ type GlobalStatistics @entity {
   uniqueClaimers: BigInt
   totalClaims: BigInt
 }
+
+type UBICollected @entity {
+  id: ID!
+  contract: Bytes, 
+  block: BigInt
+  blockTimestamp: BigInt  
+  ubi: BigDecimal!
+  communityPool: BigDecimal!
+}
+
+type UBIHistory @entity {
+  id: ID! 
+  block: BigInt
+  blockTimestamp: BigInt  
+  totalDailyUBI: BigDecimal!
+  totalDailyCommunityPool: BigDecimal!
+}

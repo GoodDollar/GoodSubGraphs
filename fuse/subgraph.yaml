@@ -160,4 +160,25 @@ dataSources:
         - event: WhitelistedRemoved(indexed address)
           handler: handleWhitelistedRemoved
       file: ./src/mapping.ts
-      
+
+  - kind: ethereum/contract
+    name: FuseStaking
+    network: fuse
+    source:
+      address: '0xA199F0C353E25AdF022378B0c208D600f39a6505'
+      abi: FuseStaking
+      startBlock: 8815068
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - UBIHistory
+        - UBICollected
+      abis:
+        - name: FuseStaking
+          file: ./abis/FuseStakingV3.min.json
+      eventHandlers:
+        - event: UBICollected(indexed uint256,uint256,uint256,uint256,uint256,uint256,address,uint256)
+          handler: handleUBICollected
+      file: ./src/ubicollected.ts
