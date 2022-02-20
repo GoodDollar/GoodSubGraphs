@@ -2,19 +2,12 @@ const { readFileSync, writeFileSync } = require('fs')
 const path = require('path')
 const merge = require('lodash.merge')
 
-const filepath = path.resolve('node_modules', '@gooddollar', 'goodcontracts', 'releases', 'deployment.json')
-const stakingModelPath = path.resolve('node_modules', '@gooddollar', 'goodcontracts', 'stakingModel', 'releases', 'deployment.json')
-const upgradablesPath = path.resolve('node_modules', '@gooddollar', 'goodcontracts', 'upgradables', 'releases', 'deployment.json')
+const c1 = require('@gooddollar/goodcontracts/releases/deployment.json')
+const c2 = require('@gooddollar/goodcontracts/stakingModel/releases/deployment.json')
+const c3 = require('@gooddollar/goodcontracts/upgradables/releases/deployment.json')
+const c4 = require('@gooddollar/goodprotocol/releases/deployment.json')
 
-const file = readFileSync(filepath, 'utf8')
-const stakingModelFile = readFileSync(stakingModelPath, 'utf8')
-const upgradablesFile = readFileSync(upgradablesPath, 'utf8')
-
-const deployments = JSON.parse(file)
-const stakingModelDeployments = JSON.parse(stakingModelFile)
-const upgradablesDeployments = JSON.parse(upgradablesFile)
-const mergedDeployments = merge(deployments, stakingModelDeployments, upgradablesDeployments)
-
+const mergedDeployments = merge(c1, c2, c3, c4)
 let data = ''
 for (const deployment in mergedDeployments) {
   if (Object.hasOwnProperty.call(mergedDeployments, deployment)) {
@@ -32,6 +25,11 @@ for (const deployment in mergedDeployments) {
     if (releases.HomeBridge && typeof releases.HomeBridge === 'object' && releases.HomeBridge !== null) {
       homeBridgeValues = handleObject(releases.HomeBridge)
       delete releases.HomeBridge
+    }
+    if(releases.StakingContracts && typeof releases.StakingContracts === 'object')
+    {
+      releases.StakingContracts = releases.StakingContracts.map(_ => _[0])
+      console.log(releases.StakingContracts)
     }
 
 
