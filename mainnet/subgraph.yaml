@@ -84,6 +84,35 @@ dataSources:
       file: ./src/mapping.ts
 
   - kind: ethereum/contract
+    name: GoodMarketMakerV2.5
+    network: mainnet
+    source:
+      address: '0xDAC6A0c973Ba7cF3526dE456aFfA43AB421f659F'
+      abi: GoodMarketMaker
+      startBlock: 14296152
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - ReserveHistory
+      abis:
+        - name: GoodMarketMaker
+          file: ./abis/GoodMarketMaker.json
+        - name: cToken
+          file: ./abis/cERC20.json
+        - name: GoodReserveCDai
+          file: ./abis/GoodReserveCDai.json
+        - name: cToken
+          file: ./abis/cERC20.json      
+        - name: GoodDollar
+          file: ./abis/GoodDollar.json                 
+      eventHandlers:
+        - event: BalancesUpdated(indexed address,indexed address,uint256,uint256,uint256,uint256)
+          handler: handleTokenSaleV2
+      file: ./src/mapping.ts
+
+  - kind: ethereum/contract
     name: GoodReserveCDai
     network: mainnet
     source:
@@ -119,6 +148,37 @@ dataSources:
       address: '0x6C35677206ae7FF1bf753877649cF57cC30D1c42'
       abi: GoodReserveCDaiV2
       startBlock:  13835700
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - ReserveHistory
+      abis:
+        - name: cToken
+          file: ./abis/cERC20.json
+        - name: GoodReserveCDai
+          file: ./abis/GoodReserveCDai.json
+        - name: GoodReserveCDaiV2
+          file: ./abis/GoodReserveCDaiV2.json
+        - name: GoodMarketMaker
+          file: ./abis/GoodMarketMaker.json
+        - name: cToken
+          file: ./abis/cERC20.json      
+        - name: GoodDollar
+          file: ./abis/GoodDollar.json      
+      eventHandlers:
+        - event: UBIMinted(indexed uint256,indexed address,uint256,uint256,uint256,uint256)
+          handler: handleUBIMintedV2
+      file: ./src/mapping.ts
+
+  - kind: ethereum/contract
+    name: GoodReserveCDaiV2.5
+    network: mainnet
+    source:
+      address: '0xa150a825d425B36329D8294eeF8bD0fE68f8F6E0'
+      abi: GoodReserveCDaiV2
+      startBlock:  14296271
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -200,6 +260,106 @@ dataSources:
       address: '0x589ceb6cA1112f7aCCA19930b47871c5A259B0fC'
       abi: SimpleStaking
       startBlock:  13835700
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - StakingHistory
+      abis:        
+        - name: cToken
+          file: ./abis/cERC20.json   
+        - name: SimpleStaking
+          file: ./abis/SimpleStaking.json            
+      eventHandlers:
+        - event: Staked(indexed address,address,uint256)
+          handler: handleStakeV2
+        - event: StakeWithdraw(indexed address,address,uint256)
+          handler: handleStakeWithdrawV2
+      file: ./src/mapping.ts
+
+  - kind: ethereum/contract 
+    name: SimpleStakingCompoundDAIV2
+    network: mainnet
+    source:
+      address: '0x02416eb83cff1f19163f21010149c3867f3261e1'
+      abi: SimpleStaking
+      startBlock:  14132483
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - StakingHistory
+      abis:        
+        - name: cToken
+          file: ./abis/cERC20.json    
+        - name: SimpleStaking
+          file: ./abis/SimpleStaking.json            
+      eventHandlers:
+        - event: Staked(indexed address,address,uint256)
+          handler: handleStakeV2
+        - event: StakeWithdraw(indexed address,address,uint256)
+          handler: handleStakeWithdrawV2
+      file: ./src/mapping.ts
+
+  - kind: ethereum/contract 
+    name: SimpleStakingAaveUSDCV2
+    network: mainnet
+    source:
+      address: '0xf4c34bed7dd779485692bb1857acf9c561b45010'
+      abi: SimpleStaking
+      startBlock:  14132483
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - StakingHistory
+      abis:        
+        - name: cToken
+          file: ./abis/cERC20.json    
+        - name: SimpleStaking
+          file: ./abis/SimpleStaking.json            
+      eventHandlers:
+        - event: Staked(indexed address,address,uint256)
+          handler: handleStakeV2
+        - event: StakeWithdraw(indexed address,address,uint256)
+          handler: handleStakeWithdrawV2
+      file: ./src/mapping.ts
+  
+  - kind: ethereum/contract 
+    name: SimpleStakingCompoundDAIV3
+    network: mainnet
+    source:
+      address: '0x7b7246c78e2f900d17646ff0cb2ec47d6ba10754'
+      abi: SimpleStaking
+      startBlock:  14132483
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - StakingHistory
+      abis:        
+        - name: cToken
+          file: ./abis/cERC20.json    
+        - name: SimpleStaking
+          file: ./abis/SimpleStaking.json            
+      eventHandlers:
+        - event: Staked(indexed address,address,uint256)
+          handler: handleStakeV2
+        - event: StakeWithdraw(indexed address,address,uint256)
+          handler: handleStakeWithdrawV2
+      file: ./src/mapping.ts
+
+  - kind: ethereum/contract 
+    name: SimpleStakingAaveUSDCV3
+    network: mainnet
+    source:
+      address: '0x3ff2d8eb2573819a9ef7167d2ba6fd6d31b17f4f'
+      abi: SimpleStaking
+      startBlock:  14132483
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5

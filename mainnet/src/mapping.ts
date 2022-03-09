@@ -2,11 +2,11 @@ import { BigInt, log, BigDecimal, Address } from '@graphprotocol/graph-ts'
 import { GoodDollar } from '../generated/GoodReserveCDai/GoodDollar'
 import { GoodMarketMaker, BalancesUpdated } from '../generated/GoodMarketMaker/GoodMarketMaker'
 import { UBIMinted } from '../generated/GoodReserveCDai/GoodReserveCDai'
-import { UBIMinted as UBIMintedV2 } from '../generated/GoodReserveCDaiV2/GoodReserveCDaiV2'
+import { UBIMinted as UBIMintedV2, GoodReserveCDaiV2 } from '../generated/GoodReserveCDaiV2/GoodReserveCDaiV2'
 
 import { cToken } from '../generated/GoodMarketMaker/cToken'
 import { DAIStakeWithdraw, DAIStaked } from '../generated/SimpleDAIStaking/SimpleDAIStaking'
-import { Staked, StakeWithdraw } from '../generated/SimpleStakingAaveUSDC/SimpleStaking'
+import { Staked, StakeWithdraw, SimpleStaking } from '../generated/SimpleStakingAaveUSDC/SimpleStaking'
 
 import { ReserveHistory, Supporter, ContractStakeHistory, StakeHistory, StakeStatistic } from '../generated/schema'
 
@@ -25,17 +25,18 @@ export function handleUBIMinted(event: UBIMinted): void {
 
 export function handleUBIMintedV2(event: UBIMintedV2): void {
   // log.info('handleUBIMinted got timestamp',[])
-  _updateReserveHistory(event.block.timestamp, event.block.number,Address.fromString("0x30d37b05cf73edd8c59ce8450f093f6c06da9272"), event.params.interestReceived, event.params.gdExpansionMinted, event.params.gdInterestMinted)
+  const marketMaker = GoodReserveCDaiV2.bind(event.address).getMarketMaker();
+  _updateReserveHistory(event.block.timestamp, event.block.number,marketMaker, event.params.interestReceived, event.params.gdExpansionMinted, event.params.gdInterestMinted)
 }
 
 export function handleTokenSale(event: BalancesUpdated): void {
   // log.info('handleTokenSale got timestamp', [])
-  _updateReserveHistory(event.block.timestamp, event.block.number,Address.fromString("0xedbe438cd865992fdb72dd252e6055a71b02be72"))
+  _updateReserveHistory(event.block.timestamp, event.block.number,event.address)
 }
 
 export function handleTokenSaleV2(event: BalancesUpdated): void {
   // log.info('handleTokenSale got timestamp', [])
-  _updateReserveHistory(event.block.timestamp, event.block.number,Address.fromString("0x30d37b05cf73edd8c59ce8450f093f6c06da9272"))
+  _updateReserveHistory(event.block.timestamp, event.block.number,event.address)
 }
 
 //collects price + reserve data
@@ -148,13 +149,14 @@ export function handleStakeWithdraw(event:DAIStakeWithdraw): void {
 }
 
 export function handleStakeV2(event: Staked): void {
-  let divider:BigDecimal = e18.toBigDecimal()
-  const addr = event.address.toHexString()
 
-  if(addr == "0x589ceb6ca1112f7acca19930b47871c5a259b0fc"){
-    //usdc 6 decimals staking contract
-    divider = BigDecimal.fromString("1000000")
-  }
+  const stakingContract = SimpleStaking.bind(event.address)
+  
+  const divider = BigInt.fromString("10").pow(stakingContract.decimals() as u8).toBigDecimal()
+  // if(addr == "0x589ceb6ca1112f7acca19930b47871c5a259b0fc"){
+  //   //usdc 6 decimals staking contract
+  //   divider = BigDecimal.fromString("1000000")
+  // }
 
   let tokenValue = event.params.value.toBigDecimal().div(divider)
 
@@ -162,12 +164,9 @@ export function handleStakeV2(event: Staked): void {
 }
 
 export function handleStakeWithdrawV2(event:StakeWithdraw): void {
-  let divider:BigDecimal = e18.toBigDecimal()
-  const addr = event.address.toHexString()
   
-  if(addr == "0x589ceb6ca1112f7acca19930b47871c5a259b0fc") {//usdc 6 decimals staking contract
-      divider = BigDecimal.fromString("1000000")
-  }
+  const stakingContract = SimpleStaking.bind(event.address)
+  const divider = BigInt.fromString("10").pow(stakingContract.decimals() as u8).toBigDecimal()
 
   let tokenValue = event.params.value.toBigDecimal().div(divider).neg();
   _handleStakeOperation(event.block.timestamp,event.address, event.params.staker,tokenValue,tokenValue ) //tokenvalue = usd value

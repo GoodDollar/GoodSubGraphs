@@ -31,6 +31,11 @@ for (const deployment in mergedDeployments) {
       releases.StakingContracts = releases.StakingContracts.map(_ => _[0])
       console.log(releases.StakingContracts)
     }
+    if(releases.StakingContractsV2 && typeof releases.StakingContractsV2 === 'object')
+    {
+      releases.StakingContractsV2 = releases.StakingContractsV2.map(_ => _[0])
+      console.log(releases.StakingContractsV2)
+    }
 
 
     let addresses = Object.values(releases)
@@ -39,7 +44,7 @@ for (const deployment in mergedDeployments) {
     // Make sure null address exists in array
     addresses.push('0x0000000000000000000000000000000000000000')
     addresses = [...new Set(addresses)]
-    data = data + `export const ${deployment.replace('-', '_')}: Array<string> = ['${addresses.join('\',\'').toLowerCase()}']\n`
+    data = data + `export const ${deployment.replace(/-/g, '_')}: Array<string> = ['${addresses.join('\',\'').toLowerCase()}']\n`
     // break;
   }
   writeFileSync(path.resolve('./scripts/releases.ts'), data)

@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@gooddollar/goodcontracts": "^2.6.1",
-    "@gooddollar/goodprotocol": "^1.0.12",
+    "@gooddollar/goodprotocol": "^1.0.14",
     "@graphprotocol/graph-cli": "^0.20.1",
     "@graphprotocol/graph-ts": "^0.20.1"
   },
