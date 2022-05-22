@@ -4,13 +4,14 @@ import {
 } from '../generated/GoodDollar/GoodDollar'
 import { GlobalStatistics, TransactionStat, WalletStat } from '../generated/schema'
 
-import * as AllContracts from '../scripts/releases'
+import { allAddresses } from '../scripts/releases'
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 let ZERO = BigInt.fromI32(0)
 const enableLogs = false;
+
 // excluding contract TXs for clean count
-let contracts = [].concat(Object.values(AllContracts))
+let contracts:Array<string> = allAddresses
 
 export function handleTransfer(event: Transfer): void {
 

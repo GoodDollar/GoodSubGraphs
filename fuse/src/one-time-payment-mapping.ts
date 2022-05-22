@@ -3,10 +3,10 @@ import { PaymentWithdraw } from '../generated/OneTimePayments/OneTimePayments'
 
 import { WalletStat, TransactionStat } from '../generated/schema'
 
-import * as AllContracts from '../scripts/releases'
+import { allAddresses } from '../scripts/releases'
 
 // excluding contract TXs for clean count
-let contracts = [].concat(Object.values(AllContracts))
+let contracts:Array<string> = allAddresses
 
 const enableLogs = false;
 

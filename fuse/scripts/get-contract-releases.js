@@ -9,6 +9,8 @@ const c4 = require('@gooddollar/goodprotocol/releases/deployment.json')
 
 const mergedDeployments = merge(c1, c2, c3, c4)
 let data = ''
+let allAddresses = []
+
 for (const deployment in mergedDeployments) {
   if (Object.hasOwnProperty.call(mergedDeployments, deployment)) {
     const releases = mergedDeployments[deployment];
@@ -44,11 +46,13 @@ for (const deployment in mergedDeployments) {
     // Make sure null address exists in array
     addresses.push('0x0000000000000000000000000000000000000000')
     addresses = [...new Set(addresses)]
+    allAddresses = allAddresses.concat(addresses)
     data = data + `export const ${deployment.replace(/-/g, '_')}: Array<string> = ['${addresses.join('\',\'').toLowerCase()}']\n`
     // break;
   }
-  writeFileSync(path.resolve('./scripts/releases.ts'), data)
 }
+data = data + `export const allAddresses: Array<string> = ['${allAddresses.join('\',\'').toLowerCase()}']\n`
+writeFileSync(path.resolve('./scripts/releases.ts'), data)
 
 function handleObject(object) {
   delete object._blockNumber
