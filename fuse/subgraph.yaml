@@ -54,10 +54,6 @@ dataSources:
             handler: handleUBICalculated
           - event: UBIClaimed(indexed address,uint256)
             handler: handleUBIClaimed
-          - event: ActivatedUser(indexed address)
-            handler: handleActivatedUser
-          - event: InactiveUserFished(indexed address,indexed address,uint256)
-            handler: handleFishedUser
       file: ./src/mapping.ts
       
   - kind: ethereum/contract
@@ -85,10 +81,6 @@ dataSources:
             handler: handleUBICalculated
           - event: UBIClaimed(indexed address,uint256)
             handler: handleUBIClaimed
-          - event: ActivatedUser(indexed address)
-            handler: handleActivatedUser
-          - event: InactiveUserFished(indexed address,indexed address,uint256)
-            handler: handleFishedUser
       file: ./src/mapping.ts
 
   - kind: ethereum/contract
