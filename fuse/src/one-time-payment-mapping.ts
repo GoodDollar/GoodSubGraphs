@@ -3,10 +3,11 @@ import { PaymentWithdraw } from '../generated/OneTimePayments/OneTimePayments'
 
 import { WalletStat, TransactionStat } from '../generated/schema'
 
-import { production } from '../scripts/releases'
+import * as AllContracts from '../scripts/releases'
 
-// Change this according to working environment
-let contracts = production
+// excluding contract TXs for clean count
+let contracts = [].concat(Object.values(AllContracts))
+
 const enableLogs = false;
 
 export function handlePaymentWithdraw(event: PaymentWithdraw): void {
