@@ -14,8 +14,8 @@
     "contract-releases": "node scripts/get-contract-releases.js"
   },
   "dependencies": {
-    "@gooddollar/goodcontracts": "^2.6.1",
-    "@gooddollar/goodprotocol": "^1.0.14",
+    "@gooddollar/goodcontracts": "^2.6.2",
+    "@gooddollar/goodprotocol": "^1.0.18",
     "@graphprotocol/graph-cli": "^0.20.1",
     "@graphprotocol/graph-ts": "^0.20.1"
   },
