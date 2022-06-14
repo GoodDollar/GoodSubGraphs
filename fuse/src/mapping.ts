@@ -15,7 +15,7 @@ import { WhitelistedAdded, WhitelistedRemoved } from '../generated/Identity/Iden
 import { DailyUBI, WalletStat, GlobalStatistics } from '../generated/schema'
 
 let ZERO = BigInt.fromI32(0)
-const enableLogs = true;
+const enableLogs = false;
 
 
 export function handleUBICalculated(event: UBICalculated): void {
@@ -224,7 +224,7 @@ function aggregateCitizenFromUBIClaimed(event: UBIClaimed): void {
     citizen.longestClaimStreak = BigInt.fromI32(1)
     isUniqueClaimer = true
   } else {
-    log.info('handleUBIClaimed claimer found {}, contract address {}', [event.params.claimer.toHexString(), event.address.toHexString()])
+    if(enableLogs) log.info('handleUBIClaimed claimer found {}, contract address {}', [event.params.claimer.toHexString(), event.address.toHexString()])
   }
 
   let now = event.block.timestamp  
@@ -267,7 +267,7 @@ export function handleFishedUser(event: InactiveUserFished):void
 
 function handleActiveUser(user: Address, isActive: boolean): void {
   
-  log.info("handleActiveUser {} {}",[user.toHexString(), isActive.toString()])
+  if(enableLogs) log.info("handleActiveUser {} {}",[user.toHexString(), isActive.toString()])
   
   let citizen = WalletStat.load(user.toHexString())
   citizen.isActiveUser = isActive;

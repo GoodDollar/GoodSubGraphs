@@ -6,7 +6,6 @@ import {
 import { UBICollected as UBICollectedRecord, UBIHistory } from '../generated/schema'
 
 let ZERO = BigInt.fromI32(0)
-const enableLogs = true;
 
 export function handleUBICollected(event: UBICollected): void{
     let ubievent = new UBICollectedRecord(event.address.toHexString() + "_" + event.transaction.hash.toHexString());
