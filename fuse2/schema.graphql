@@ -8,7 +8,7 @@ type Minter @entity {
   totalBurned: BigInt!
 }
 
-type GlobalStatistics @entity {
+type MintBurnStats @entity {
   id: ID!
   totalMintCap: BigInt
   totalMinted: BigInt
@@ -17,17 +17,22 @@ type GlobalStatistics @entity {
   totalBurned: BigInt
 }
 
-type InviteeJoined @entity {
+type InvitesStats @entity {
   id: ID!
-  inviter: Bytes! # address
-  invitee: Bytes! # address
+  totalApprovedInvites: BigInt
+  totalBountiesPaid: BigInt
+  totalInvited: BigInt
 }
 
-type InviterBounty @entity {
+type User @entity {
   id: ID!
-  inviter: Bytes! # address
-  invitee: Bytes! # address
-  bountyPaid: BigInt! # uint256
-  inviterLevel: BigInt! # uint256
-  earnedLevel: Boolean! # bool
+  invitedBy: Bytes! # address
+  bountyPaid: Boolean
+  invitees: [Bytes!]!
+  pending: [Bytes!]!
+  level: BigInt
+  levelStarted: BigInt
+  totalApprovedInvites: BigInt
+  totalEarned: BigInt
+  joinedAt: BigInt
 }

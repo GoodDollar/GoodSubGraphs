@@ -97,7 +97,7 @@ export class Minter extends Entity {
   }
 }
 
-export class GlobalStatistics extends Entity {
+export class MintBurnStats extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -105,20 +105,18 @@ export class GlobalStatistics extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save GlobalStatistics entity without an ID");
+    assert(id != null, "Cannot save MintBurnStats entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        `Entities of type GlobalStatistics must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+        `Entities of type MintBurnStats must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
       );
-      store.set("GlobalStatistics", id.toString(), this);
+      store.set("MintBurnStats", id.toString(), this);
     }
   }
 
-  static load(id: string): GlobalStatistics | null {
-    return changetype<GlobalStatistics | null>(
-      store.get("GlobalStatistics", id)
-    );
+  static load(id: string): MintBurnStats | null {
+    return changetype<MintBurnStats | null>(store.get("MintBurnStats", id));
   }
 
   get id(): string {
@@ -216,7 +214,7 @@ export class GlobalStatistics extends Entity {
   }
 }
 
-export class InviteeJoined extends Entity {
+export class InvitesStats extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -224,18 +222,18 @@ export class InviteeJoined extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save InviteeJoined entity without an ID");
+    assert(id != null, "Cannot save InvitesStats entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        `Entities of type InviteeJoined must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+        `Entities of type InvitesStats must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
       );
-      store.set("InviteeJoined", id.toString(), this);
+      store.set("InvitesStats", id.toString(), this);
     }
   }
 
-  static load(id: string): InviteeJoined | null {
-    return changetype<InviteeJoined | null>(store.get("InviteeJoined", id));
+  static load(id: string): InvitesStats | null {
+    return changetype<InvitesStats | null>(store.get("InvitesStats", id));
   }
 
   get id(): string {
@@ -247,26 +245,59 @@ export class InviteeJoined extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get inviter(): Bytes {
-    let value = this.get("inviter");
-    return value!.toBytes();
+  get totalApprovedInvites(): BigInt | null {
+    let value = this.get("totalApprovedInvites");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
   }
 
-  set inviter(value: Bytes) {
-    this.set("inviter", Value.fromBytes(value));
+  set totalApprovedInvites(value: BigInt | null) {
+    if (!value) {
+      this.unset("totalApprovedInvites");
+    } else {
+      this.set("totalApprovedInvites", Value.fromBigInt(<BigInt>value));
+    }
   }
 
-  get invitee(): Bytes {
-    let value = this.get("invitee");
-    return value!.toBytes();
+  get totalBountiesPaid(): BigInt | null {
+    let value = this.get("totalBountiesPaid");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
   }
 
-  set invitee(value: Bytes) {
-    this.set("invitee", Value.fromBytes(value));
+  set totalBountiesPaid(value: BigInt | null) {
+    if (!value) {
+      this.unset("totalBountiesPaid");
+    } else {
+      this.set("totalBountiesPaid", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get totalInvited(): BigInt | null {
+    let value = this.get("totalInvited");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set totalInvited(value: BigInt | null) {
+    if (!value) {
+      this.unset("totalInvited");
+    } else {
+      this.set("totalInvited", Value.fromBigInt(<BigInt>value));
+    }
   }
 }
 
-export class InviterBounty extends Entity {
+export class User extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -274,18 +305,18 @@ export class InviterBounty extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save InviterBounty entity without an ID");
+    assert(id != null, "Cannot save User entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        `Entities of type InviterBounty must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+        `Entities of type User must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
       );
-      store.set("InviterBounty", id.toString(), this);
+      store.set("User", id.toString(), this);
     }
   }
 
-  static load(id: string): InviterBounty | null {
-    return changetype<InviterBounty | null>(store.get("InviterBounty", id));
+  static load(id: string): User | null {
+    return changetype<User | null>(store.get("User", id));
   }
 
   get id(): string {
@@ -297,48 +328,124 @@ export class InviterBounty extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get inviter(): Bytes {
-    let value = this.get("inviter");
+  get invitedBy(): Bytes {
+    let value = this.get("invitedBy");
     return value!.toBytes();
   }
 
-  set inviter(value: Bytes) {
-    this.set("inviter", Value.fromBytes(value));
+  set invitedBy(value: Bytes) {
+    this.set("invitedBy", Value.fromBytes(value));
   }
 
-  get invitee(): Bytes {
-    let value = this.get("invitee");
-    return value!.toBytes();
-  }
-
-  set invitee(value: Bytes) {
-    this.set("invitee", Value.fromBytes(value));
-  }
-
-  get bountyPaid(): BigInt {
+  get bountyPaid(): boolean {
     let value = this.get("bountyPaid");
-    return value!.toBigInt();
-  }
-
-  set bountyPaid(value: BigInt) {
-    this.set("bountyPaid", Value.fromBigInt(value));
-  }
-
-  get inviterLevel(): BigInt {
-    let value = this.get("inviterLevel");
-    return value!.toBigInt();
-  }
-
-  set inviterLevel(value: BigInt) {
-    this.set("inviterLevel", Value.fromBigInt(value));
-  }
-
-  get earnedLevel(): boolean {
-    let value = this.get("earnedLevel");
     return value!.toBoolean();
   }
 
-  set earnedLevel(value: boolean) {
-    this.set("earnedLevel", Value.fromBoolean(value));
+  set bountyPaid(value: boolean) {
+    this.set("bountyPaid", Value.fromBoolean(value));
+  }
+
+  get invitees(): Array<Bytes> {
+    let value = this.get("invitees");
+    return value!.toBytesArray();
+  }
+
+  set invitees(value: Array<Bytes>) {
+    this.set("invitees", Value.fromBytesArray(value));
+  }
+
+  get pending(): Array<Bytes> {
+    let value = this.get("pending");
+    return value!.toBytesArray();
+  }
+
+  set pending(value: Array<Bytes>) {
+    this.set("pending", Value.fromBytesArray(value));
+  }
+
+  get level(): BigInt | null {
+    let value = this.get("level");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set level(value: BigInt | null) {
+    if (!value) {
+      this.unset("level");
+    } else {
+      this.set("level", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get levelStarted(): BigInt | null {
+    let value = this.get("levelStarted");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set levelStarted(value: BigInt | null) {
+    if (!value) {
+      this.unset("levelStarted");
+    } else {
+      this.set("levelStarted", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get totalApprovedInvites(): BigInt | null {
+    let value = this.get("totalApprovedInvites");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set totalApprovedInvites(value: BigInt | null) {
+    if (!value) {
+      this.unset("totalApprovedInvites");
+    } else {
+      this.set("totalApprovedInvites", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get totalEarned(): BigInt | null {
+    let value = this.get("totalEarned");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set totalEarned(value: BigInt | null) {
+    if (!value) {
+      this.unset("totalEarned");
+    } else {
+      this.set("totalEarned", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get joinedAt(): BigInt | null {
+    let value = this.get("joinedAt");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set joinedAt(value: BigInt | null) {
+    if (!value) {
+      this.unset("joinedAt");
+    } else {
+      this.set("joinedAt", Value.fromBigInt(<BigInt>value));
+    }
   }
 }
