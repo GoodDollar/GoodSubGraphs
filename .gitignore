@@ -5,3 +5,4 @@ fuse/generated
 mainnet/build
 mainnet/generated
 mainnet/docker/data
+fuse2/node_modules
