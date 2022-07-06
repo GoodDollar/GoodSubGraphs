@@ -44,46 +44,20 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - AdminChanged
-        - BeaconUpgraded
-        - Burned
-        - Minted
-        - MinterSet
-        - Paused
-        - RoleAdminChanged
-        - RoleGranted
-        - RoleRevoked
-        - SendOrMint
-        - Unpaused
-        - Upgraded
+        - Minter
+        - GlobalStatistics
       abis:
         - name: GoodDollarMintBurnWrapper
           file: ./abis/GoodDollarMintBurnWrapper.json
       eventHandlers:
-        - event: AdminChanged(address,address)
-          handler: handleAdminChanged
-        - event: BeaconUpgraded(indexed address)
-          handler: handleBeaconUpgraded
         - event: Burned(address,uint256)
           handler: handleBurned
         - event: Minted(address,uint256)
           handler: handleMinted
         - event: MinterSet(address,uint256,uint256,uint32,bool,bool)
           handler: handleMinterSet
-        - event: Paused(bytes32)
-          handler: handlePaused
-        - event: RoleAdminChanged(indexed bytes32,indexed bytes32,indexed bytes32)
-          handler: handleRoleAdminChanged
-        - event: RoleGranted(indexed bytes32,indexed address,indexed address)
-          handler: handleRoleGranted
-        - event: RoleRevoked(indexed bytes32,indexed address,indexed address)
-          handler: handleRoleRevoked
         - event: SendOrMint(address,uint256,uint256,uint256,uint256)
           handler: handleSendOrMint
-        - event: Unpaused(bytes32)
-          handler: handleUnpaused
-        - event: Upgraded(indexed address)
-          handler: handleUpgraded
       file: ./src/good-dollar-mint-burn-wrapper.ts
   - kind: ethereum
     name: InvitesV1
