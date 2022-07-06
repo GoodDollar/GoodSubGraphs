@@ -1,0 +1,97 @@
+type ExampleEntity @entity {
+  id: ID!
+  count: BigInt!
+  owner: Bytes! # address
+  spender: Bytes! # address
+}
+type AdminChanged @entity {
+  id: ID!
+  previousAdmin: Bytes! # address
+  newAdmin: Bytes! # address
+}
+
+type BeaconUpgraded @entity {
+  id: ID!
+  beacon: Bytes! # address
+}
+
+type Burned @entity {
+  id: ID!
+  to: Bytes! # address
+  amount: BigInt! # uint256
+}
+
+type Minted @entity {
+  id: ID!
+  to: Bytes! # address
+  amount: BigInt! # uint256
+}
+
+type MinterSet @entity {
+  id: ID!
+  minter: Bytes! # address
+  totalMintCap: BigInt! # uint256
+  perTxCap: BigInt! # uint256
+  bps: BigInt! # uint32
+  rewardsRole: Boolean! # bool
+  isUpdate: Boolean! # bool
+}
+
+type Paused @entity {
+  id: ID!
+  role: Bytes! # bytes32
+}
+
+type RoleAdminChanged @entity {
+  id: ID!
+  role: Bytes! # bytes32
+  previousAdminRole: Bytes! # bytes32
+  newAdminRole: Bytes! # bytes32
+}
+
+type RoleGranted @entity {
+  id: ID!
+  role: Bytes! # bytes32
+  account: Bytes! # address
+  sender: Bytes! # address
+}
+
+type RoleRevoked @entity {
+  id: ID!
+  role: Bytes! # bytes32
+  account: Bytes! # address
+  sender: Bytes! # address
+}
+
+type SendOrMint @entity {
+  id: ID!
+  to: Bytes! # address
+  amount: BigInt! # uint256
+  sent: BigInt! # uint256
+  minted: BigInt! # uint256
+  outstandingMintDebt: BigInt! # uint256
+}
+
+type Unpaused @entity {
+  id: ID!
+  role: Bytes! # bytes32
+}
+
+type Upgraded @entity {
+  id: ID!
+  implementation: Bytes! # address
+}
+type InviteeJoined @entity {
+  id: ID!
+  inviter: Bytes! # address
+  invitee: Bytes! # address
+}
+
+type InviterBounty @entity {
+  id: ID!
+  inviter: Bytes! # address
+  invitee: Bytes! # address
+  bountyPaid: BigInt! # uint256
+  inviterLevel: BigInt! # uint256
+  earnedLevel: Boolean! # bool
+}

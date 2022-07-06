@@ -1,0 +1,13 @@
+{
+  "fuse": {
+    "GoodDollarStaking": {
+      "address": "0x264adeA794247a7E4DC216c7CA2F1429e3AF54A9"
+    },
+    "GoodDollarMintBurnWrapper": {
+      "address": "0x264ADeA794247a7e4dc216C7cA2F1429e3Af54A8"
+    },
+    "InvitesV1": {
+      "address": "0x264aDeA794247A7e4DC216c7ca2F1429E3aF54a7"
+    }
+  }
+}

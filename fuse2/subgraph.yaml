@@ -1,0 +1,109 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: GoodDollarStaking
+    network: fuse
+    source:
+      address: "0x264adeA794247a7E4DC216c7CA2F1429e3AF54A9"
+      abi: GoodDollarStaking
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - ReputationEarned
+        - StakeWithdraw
+        - Staked
+        - Transfer
+      abis:
+        - name: GoodDollarStaking
+          file: ./abis/GoodDollarStaking.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: ReputationEarned(indexed address,uint256)
+          handler: handleReputationEarned
+        - event: StakeWithdraw(indexed address,uint256,uint256,uint256)
+          handler: handleStakeWithdraw
+        - event: Staked(indexed address,uint256,uint32)
+          handler: handleStaked
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/good-dollar-staking.ts
+  - kind: ethereum
+    name: GoodDollarMintBurnWrapper
+    network: fuse
+    source:
+      address: "0x264ADeA794247a7e4dc216C7cA2F1429e3Af54A8"
+      abi: GoodDollarMintBurnWrapper
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - AdminChanged
+        - BeaconUpgraded
+        - Burned
+        - Minted
+        - MinterSet
+        - Paused
+        - RoleAdminChanged
+        - RoleGranted
+        - RoleRevoked
+        - SendOrMint
+        - Unpaused
+        - Upgraded
+      abis:
+        - name: GoodDollarMintBurnWrapper
+          file: ./abis/GoodDollarMintBurnWrapper.json
+      eventHandlers:
+        - event: AdminChanged(address,address)
+          handler: handleAdminChanged
+        - event: BeaconUpgraded(indexed address)
+          handler: handleBeaconUpgraded
+        - event: Burned(address,uint256)
+          handler: handleBurned
+        - event: Minted(address,uint256)
+          handler: handleMinted
+        - event: MinterSet(address,uint256,uint256,uint32,bool,bool)
+          handler: handleMinterSet
+        - event: Paused(bytes32)
+          handler: handlePaused
+        - event: RoleAdminChanged(indexed bytes32,indexed bytes32,indexed bytes32)
+          handler: handleRoleAdminChanged
+        - event: RoleGranted(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleGranted
+        - event: RoleRevoked(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleRevoked
+        - event: SendOrMint(address,uint256,uint256,uint256,uint256)
+          handler: handleSendOrMint
+        - event: Unpaused(bytes32)
+          handler: handleUnpaused
+        - event: Upgraded(indexed address)
+          handler: handleUpgraded
+      file: ./src/good-dollar-mint-burn-wrapper.ts
+  - kind: ethereum
+    name: InvitesV1
+    network: fuse
+    source:
+      address: "0x264aDeA794247A7e4DC216c7ca2F1429E3aF54a7"
+      abi: InvitesV1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - InviteeJoined
+        - InviterBounty
+      abis:
+        - name: InvitesV1
+          file: ./abis/InvitesV1.json
+      eventHandlers:
+        - event: InviteeJoined(indexed address,indexed address)
+          handler: handleInviteeJoined
+        - event: InviterBounty(indexed address,indexed address,uint256,uint256,bool)
+          handler: handleInviterBounty
+      file: ./src/invites-v-1.ts
