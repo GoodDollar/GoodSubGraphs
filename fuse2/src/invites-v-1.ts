@@ -12,9 +12,7 @@ export function handleInviteeJoined(event: InviteeJoinedEvent): void {
   const invitee = getInitUser(event.params.invitee.toHexString(), event.block.timestamp)
 
   //init inviter if exists
-  const invitorIsZero = event.params.inviter.toHexString() != ADDRESS_ZERO
-
-  if (!invitorIsZero) {
+  if (event.params.inviter.toHexString() != ADDRESS_ZERO) {
     const inviter = getInitUser(event.params.invitee.toHexString(), event.block.timestamp)
 
     //update inviter
@@ -49,6 +47,10 @@ export function handleInviterBounty(event: InviterBountyEvent): void {
   inviter.save()
 
   //update invitee
+  if (invitee.invitedBy.toHexString() == ADDRESS_ZERO) {
+    // Didn't count on join event as it was unknown, so count now
+    inviter.totalMadeInvites = inviter.totalMadeInvites.plus(BigInt.fromI32(1))
+  }
   invitee.invitedBy = event.params.inviter
   invitee.earnedAsInvitee = event.params.bountyPaid.div(BigInt.fromI32(2))
 
