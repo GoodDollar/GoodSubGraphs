@@ -1,61 +1,72 @@
-import { BigInt, Address } from "@graphprotocol/graph-ts";
+import { BigInt } from "@graphprotocol/graph-ts"
 import {
   InviteeJoined as InviteeJoinedEvent,
   InviterBounty as InviterBountyEvent,
-} from "../generated/InvitesV1/InvitesV1";
-import { InvitesStats, User } from "../generated/schema";
+} from "../generated/InvitesV1/InvitesV1"
+import { InvitesStats, User } from "../generated/schema"
 
-const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
+const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000"
 
 export function handleInviteeJoined(event: InviteeJoinedEvent): void {
   //init invitee
-  let invitee = User.load(event.params.invitee.toHexString());
-  if (invitee == null) {
-    invitee = new User(event.params.invitee.toHexString());
-    invitee.bountyPaid = false;
-    invitee.totalApprovedInvites = BigInt.zero();
-    invitee.totalEarned = BigInt.zero();
-    // invitee.invitees
-    // invitee.pending
-    // invitee.levelStarted
-    // invitee.level = event.block.timestamp;
-    invitee.joinedAt = event.block.timestamp;
-  }
+  const invitee = getInitUser(event.params.invitee.toHexString(), event.block.timestamp)
 
-  const invitorIsZero = event.params.inviter.toHexString() != ADDRESS_ZERO;
+  //init inviter if exists
+  const invitorIsZero = event.params.inviter.toHexString() != ADDRESS_ZERO
 
-  //init inviter
   if (!invitorIsZero) {
-    let inviter = User.load(event.params.inviter.toHexString());
-
-    if (inviter == null) {
-      inviter = new User(event.params.inviter.toHexString());
-      inviter.bountyPaid = false;
-      inviter.totalApprovedInvites = BigInt.zero();
-      inviter.totalEarned = BigInt.zero();
-      // inviter.invitees
-      // inviter.pending
-      // inviter.levelStarted
-      // inviter.level = event.block.timestamp;
-      inviter.joinedAt = event.block.timestamp;
-    }
+    const inviter = getInitUser(event.params.invitee.toHexString(), event.block.timestamp)
 
     //update inviter
+    inviter.invitees.push(event.params.invitee)
+    inviter.pending.push(event.params.invitee)
+    inviter.totalMadeInvites = inviter.totalMadeInvites.plus(BigInt.fromI32(1))
+    inviter.save()
 
-    inviter.save();
+    //update invitee
+    invitee.invitedBy = event.params.inviter
   }
 
-  invitee.save();
+  invitee.save()
 }
 
 export function handleInviterBounty(event: InviterBountyEvent): void {
-  // let entity = new InviterBounty(
-  //   event.transaction.hash.toHex() + "-" + event.logIndex.toString()
-  // )
-  // entity.inviter = event.params.inviter
-  // entity.invitee = event.params.invitee
-  // entity.bountyPaid = event.params.bountyPaid
-  // entity.inviterLevel = event.params.inviterLevel
-  // entity.earnedLevel = event.params.earnedLevel
-  // entity.save()
+  //init invitee
+  const invitee = getInitUser(event.params.invitee.toHexString(), event.block.timestamp)
+
+  //init inviter
+  const inviter = getInitUser(event.params.invitee.toHexString(), event.block.timestamp)
+
+  //update inviter
+  inviter.totalApprovedInvites = inviter.totalApprovedInvites.plus(BigInt.fromI32(1))
+  inviter.totalEarnedAsInviter = inviter.totalEarnedAsInviter.plus(event.params.bountyPaid)
+  inviter.invitees.push(event.params.invitee)
+  const index = inviter.pending.indexOf(event.params.invitee, 0)
+  if (index > -1) {
+    inviter.pending.splice(index, 1)
+  }
+
+  inviter.save()
+
+  //update invitee
+  invitee.invitedBy = event.params.inviter
+  invitee.earnedAsInvitee = event.params.bountyPaid.div(BigInt.fromI32(2))
+
+  invitee.save()
+}
+
+function getInitUser(id: string, timestamp: BigInt) {
+  let user = User.load(id)
+  if (user == null) {
+    user = new User(id)
+    user.bountyPaid = false
+    user.totalMadeInvites = BigInt.zero()
+    user.totalApprovedInvites = BigInt.zero()
+    user.totalEarnedAsInviter = BigInt.zero()
+    user.earnedAsInvitee = BigInt.zero()
+    // todo: handle levels if needed
+    user.joinedAt = timestamp
+  }
+
+  return user
 }

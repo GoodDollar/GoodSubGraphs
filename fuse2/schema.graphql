@@ -27,12 +27,14 @@ type InvitesStats @entity {
 type User @entity {
   id: ID!
   invitedBy: Bytes! # address
-  bountyPaid: Boolean
+  bountyPaid: Boolean!
   invitees: [Bytes!]!
   pending: [Bytes!]!
-  level: BigInt
-  levelStarted: BigInt
-  totalApprovedInvites: BigInt
-  totalEarned: BigInt
-  joinedAt: BigInt
+  level: BigInt!
+  levelStarted: BigInt!
+  totalMadeInvites: BigInt! # total joined via inviter
+  totalApprovedInvites: BigInt! # total joined via inviter and approved
+  totalEarnedAsInviter: BigInt!
+  joinedAt: BigInt!
+  earnedAsInvitee: BigInt!
 }

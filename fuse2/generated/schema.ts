@@ -364,88 +364,66 @@ export class User extends Entity {
     this.set("pending", Value.fromBytesArray(value));
   }
 
-  get level(): BigInt | null {
+  get level(): BigInt {
     let value = this.get("level");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toBigInt();
   }
 
-  set level(value: BigInt | null) {
-    if (!value) {
-      this.unset("level");
-    } else {
-      this.set("level", Value.fromBigInt(<BigInt>value));
-    }
+  set level(value: BigInt) {
+    this.set("level", Value.fromBigInt(value));
   }
 
-  get levelStarted(): BigInt | null {
+  get levelStarted(): BigInt {
     let value = this.get("levelStarted");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toBigInt();
   }
 
-  set levelStarted(value: BigInt | null) {
-    if (!value) {
-      this.unset("levelStarted");
-    } else {
-      this.set("levelStarted", Value.fromBigInt(<BigInt>value));
-    }
+  set levelStarted(value: BigInt) {
+    this.set("levelStarted", Value.fromBigInt(value));
   }
 
-  get totalApprovedInvites(): BigInt | null {
+  get totalMadeInvites(): BigInt {
+    let value = this.get("totalMadeInvites");
+    return value!.toBigInt();
+  }
+
+  set totalMadeInvites(value: BigInt) {
+    this.set("totalMadeInvites", Value.fromBigInt(value));
+  }
+
+  get totalApprovedInvites(): BigInt {
     let value = this.get("totalApprovedInvites");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toBigInt();
   }
 
-  set totalApprovedInvites(value: BigInt | null) {
-    if (!value) {
-      this.unset("totalApprovedInvites");
-    } else {
-      this.set("totalApprovedInvites", Value.fromBigInt(<BigInt>value));
-    }
+  set totalApprovedInvites(value: BigInt) {
+    this.set("totalApprovedInvites", Value.fromBigInt(value));
   }
 
-  get totalEarned(): BigInt | null {
-    let value = this.get("totalEarned");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+  get totalEarnedAsInviter(): BigInt {
+    let value = this.get("totalEarnedAsInviter");
+    return value!.toBigInt();
   }
 
-  set totalEarned(value: BigInt | null) {
-    if (!value) {
-      this.unset("totalEarned");
-    } else {
-      this.set("totalEarned", Value.fromBigInt(<BigInt>value));
-    }
+  set totalEarnedAsInviter(value: BigInt) {
+    this.set("totalEarnedAsInviter", Value.fromBigInt(value));
   }
 
-  get joinedAt(): BigInt | null {
+  get joinedAt(): BigInt {
     let value = this.get("joinedAt");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toBigInt();
   }
 
-  set joinedAt(value: BigInt | null) {
-    if (!value) {
-      this.unset("joinedAt");
-    } else {
-      this.set("joinedAt", Value.fromBigInt(<BigInt>value));
-    }
+  set joinedAt(value: BigInt) {
+    this.set("joinedAt", Value.fromBigInt(value));
+  }
+
+  get earnedAsInvitee(): BigInt {
+    let value = this.get("earnedAsInvitee");
+    return value!.toBigInt();
+  }
+
+  set earnedAsInvitee(value: BigInt) {
+    this.set("earnedAsInvitee", Value.fromBigInt(value));
   }
 }
