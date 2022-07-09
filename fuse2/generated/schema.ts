@@ -214,6 +214,133 @@ export class MintBurnStats extends Entity {
   }
 }
 
+export class InviteeJoined extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save InviteeJoined entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type InviteeJoined must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("InviteeJoined", id.toString(), this);
+    }
+  }
+
+  static load(id: string): InviteeJoined | null {
+    return changetype<InviteeJoined | null>(store.get("InviteeJoined", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get inviter(): Bytes {
+    let value = this.get("inviter");
+    return value!.toBytes();
+  }
+
+  set inviter(value: Bytes) {
+    this.set("inviter", Value.fromBytes(value));
+  }
+
+  get invitee(): Bytes {
+    let value = this.get("invitee");
+    return value!.toBytes();
+  }
+
+  set invitee(value: Bytes) {
+    this.set("invitee", Value.fromBytes(value));
+  }
+}
+
+export class InviterBounty extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save InviterBounty entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type InviterBounty must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("InviterBounty", id.toString(), this);
+    }
+  }
+
+  static load(id: string): InviterBounty | null {
+    return changetype<InviterBounty | null>(store.get("InviterBounty", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get inviter(): Bytes {
+    let value = this.get("inviter");
+    return value!.toBytes();
+  }
+
+  set inviter(value: Bytes) {
+    this.set("inviter", Value.fromBytes(value));
+  }
+
+  get invitee(): Bytes {
+    let value = this.get("invitee");
+    return value!.toBytes();
+  }
+
+  set invitee(value: Bytes) {
+    this.set("invitee", Value.fromBytes(value));
+  }
+
+  get bountyPaid(): BigInt {
+    let value = this.get("bountyPaid");
+    return value!.toBigInt();
+  }
+
+  set bountyPaid(value: BigInt) {
+    this.set("bountyPaid", Value.fromBigInt(value));
+  }
+
+  get inviterLevel(): BigInt {
+    let value = this.get("inviterLevel");
+    return value!.toBigInt();
+  }
+
+  set inviterLevel(value: BigInt) {
+    this.set("inviterLevel", Value.fromBigInt(value));
+  }
+
+  get earnedLevel(): boolean {
+    let value = this.get("earnedLevel");
+    return value!.toBoolean();
+  }
+
+  set earnedLevel(value: boolean) {
+    this.set("earnedLevel", Value.fromBoolean(value));
+  }
+}
+
 export class InvitesStats extends Entity {
   constructor(id: string) {
     super();

@@ -17,6 +17,21 @@ type MintBurnStats @entity {
   totalBurned: BigInt
 }
 
+type InviteeJoined @entity {
+  id: ID!
+  inviter: Bytes! # address
+  invitee: Bytes! # address
+}
+
+type InviterBounty @entity {
+  id: ID!
+  inviter: Bytes! # address
+  invitee: Bytes! # address
+  bountyPaid: BigInt! # uint256
+  inviterLevel: BigInt! # uint256
+  earnedLevel: Boolean! # bool
+}
+
 type InvitesStats @entity {
   id: ID!
   totalApprovedInvites: BigInt!

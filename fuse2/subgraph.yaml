@@ -72,6 +72,8 @@ dataSources:
       entities:
         - InvitesStats
         - User
+        - InviteeJoined
+        - InviterBounty
       abis:
         - name: InvitesV1
           file: ./abis/InvitesV1.json
