@@ -254,6 +254,15 @@ export class InvitesStats extends Entity {
     this.set("totalApprovedInvites", Value.fromBigInt(value));
   }
 
+  get totalPending(): BigInt {
+    let value = this.get("totalPending");
+    return value!.toBigInt();
+  }
+
+  set totalPending(value: BigInt) {
+    this.set("totalPending", Value.fromBigInt(value));
+  }
+
   get totalInvitersBounties(): BigInt {
     let value = this.get("totalInvitersBounties");
     return value!.toBigInt();
@@ -270,15 +279,6 @@ export class InvitesStats extends Entity {
 
   set totalInvited(value: BigInt) {
     this.set("totalInvited", Value.fromBigInt(value));
-  }
-
-  get totalPending(): BigInt {
-    let value = this.get("totalPending");
-    return value!.toBigInt();
-  }
-
-  set totalPending(value: BigInt) {
-    this.set("totalPending", Value.fromBigInt(value));
   }
 }
 
