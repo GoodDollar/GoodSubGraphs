@@ -245,55 +245,40 @@ export class InvitesStats extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get totalApprovedInvites(): BigInt | null {
+  get totalApprovedInvites(): BigInt {
     let value = this.get("totalApprovedInvites");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toBigInt();
   }
 
-  set totalApprovedInvites(value: BigInt | null) {
-    if (!value) {
-      this.unset("totalApprovedInvites");
-    } else {
-      this.set("totalApprovedInvites", Value.fromBigInt(<BigInt>value));
-    }
+  set totalApprovedInvites(value: BigInt) {
+    this.set("totalApprovedInvites", Value.fromBigInt(value));
   }
 
-  get totalBountiesPaid(): BigInt | null {
-    let value = this.get("totalBountiesPaid");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+  get totalInvitersBounties(): BigInt {
+    let value = this.get("totalInvitersBounties");
+    return value!.toBigInt();
   }
 
-  set totalBountiesPaid(value: BigInt | null) {
-    if (!value) {
-      this.unset("totalBountiesPaid");
-    } else {
-      this.set("totalBountiesPaid", Value.fromBigInt(<BigInt>value));
-    }
+  set totalInvitersBounties(value: BigInt) {
+    this.set("totalInvitersBounties", Value.fromBigInt(value));
   }
 
-  get totalInvited(): BigInt | null {
+  get totalInvited(): BigInt {
     let value = this.get("totalInvited");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toBigInt();
   }
 
-  set totalInvited(value: BigInt | null) {
-    if (!value) {
-      this.unset("totalInvited");
-    } else {
-      this.set("totalInvited", Value.fromBigInt(<BigInt>value));
-    }
+  set totalInvited(value: BigInt) {
+    this.set("totalInvited", Value.fromBigInt(value));
+  }
+
+  get totalPending(): BigInt {
+    let value = this.get("totalPending");
+    return value!.toBigInt();
+  }
+
+  set totalPending(value: BigInt) {
+    this.set("totalPending", Value.fromBigInt(value));
   }
 }
 
@@ -382,13 +367,22 @@ export class User extends Entity {
     this.set("levelStarted", Value.fromBigInt(value));
   }
 
-  get totalMadeInvites(): BigInt {
-    let value = this.get("totalMadeInvites");
+  get totalPending(): BigInt {
+    let value = this.get("totalPending");
     return value!.toBigInt();
   }
 
-  set totalMadeInvites(value: BigInt) {
-    this.set("totalMadeInvites", Value.fromBigInt(value));
+  set totalPending(value: BigInt) {
+    this.set("totalPending", Value.fromBigInt(value));
+  }
+
+  get totalInvited(): BigInt {
+    let value = this.get("totalInvited");
+    return value!.toBigInt();
+  }
+
+  set totalInvited(value: BigInt) {
+    this.set("totalInvited", Value.fromBigInt(value));
   }
 
   get totalApprovedInvites(): BigInt {
