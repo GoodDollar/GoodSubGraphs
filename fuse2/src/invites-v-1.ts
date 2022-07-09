@@ -66,10 +66,6 @@ export function handleInviterBounty(event: InviterBountyEvent): void {
   inviter.save()
 
   //update invitee
-  if (invitee.invitedBy.toHexString() == ADDRESS_ZERO) {
-    // Didn't count on join event as it was unknown, so count now
-    inviter.totalInvited = inviter.totalInvited.plus(BigInt.fromI32(1))
-  }
   invitee.invitedBy = event.params.inviter
   invitee.earnedAsInvitee = event.params.bountyPaid.div(BigInt.fromI32(2))
 
