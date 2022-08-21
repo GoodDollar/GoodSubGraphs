@@ -2,7 +2,8 @@
   "name": "GoodSubGraphs",
   "license": "UNLICENSED",
   "scripts": {
-    "codegen": "graph codegen",
+    "copyGood": "cp ../fuse2/src/good.ts src && cp ../fuse2/abis/GReputation.json abis",
+    "codegen": "yarn copyGood && graph codegen",
     "build": "graph build",
     "deploy": "graph deploy --product hosted-service GoodDollar/GoodSubGraphs",
     "deployold": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ GoodDollar/GoodSubGraphs",

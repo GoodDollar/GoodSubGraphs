@@ -8,12 +8,12 @@ import { InviteeJoined, InviterBounty, InvitesStats, User } from "../generated/s
 const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000"
 
 export function handleInviteeJoined(event: InviteeJoinedEvent): void {
-  let entity = new InviteeJoined(
-    event.transaction.hash.toHex() + "-" + event.logIndex.toString()
-  )
-  entity.inviter = event.params.inviter
-  entity.invitee = event.params.invitee
-  entity.save()
+  // let entity = new InviteeJoined(
+  //   event.transaction.hash.toHex() + "-" + event.logIndex.toString()
+  // )
+  // entity.inviter = event.params.inviter
+  // entity.invitee = event.params.invitee
+  // entity.save()
 
   //init stats
   const stats = getInitStats()
@@ -25,9 +25,8 @@ export function handleInviteeJoined(event: InviteeJoinedEvent): void {
   if (event.params.inviter.toHexString() != ADDRESS_ZERO) {
     const inviter = getInitUser(event.params.invitee.toHexString(), event.block.timestamp)
 
-    //update inviter and stats
-    inviter.invitees.push(event.params.invitee)
-    inviter.pending.push(event.params.invitee)
+    //update inviter and stats    
+    inviter.pending.push(event.params.invitee.toHexString())
 
     inviter.totalInvited = inviter.totalInvited.plus(BigInt.fromI32(1))
     stats.totalInvited = stats.totalInvited.plus(BigInt.fromI32(1))
@@ -39,22 +38,22 @@ export function handleInviteeJoined(event: InviteeJoinedEvent): void {
     stats.save()
 
     //update invitee
-    invitee.invitedBy = event.params.inviter
+    invitee.invitedBy = event.params.inviter.toHexString()
   }
 
   invitee.save()
 }
 
 export function handleInviterBounty(event: InviterBountyEvent): void {
-  let entity = new InviterBounty(
-    event.transaction.hash.toHex() + "-" + event.logIndex.toString()
-  )
-  entity.inviter = event.params.inviter
-  entity.invitee = event.params.invitee
-  entity.bountyPaid = event.params.bountyPaid
-  entity.inviterLevel = event.params.inviterLevel
-  entity.earnedLevel = event.params.earnedLevel
-  entity.save()
+  // let entity = new InviterBounty(
+  //   event.transaction.hash.toHex() + "-" + event.logIndex.toString()
+  // )
+  // entity.inviter = event.params.inviter
+  // entity.invitee = event.params.invitee
+  // entity.bountyPaid = event.params.bountyPaid
+  // entity.inviterLevel = event.params.inviterLevel
+  // entity.earnedLevel = event.params.earnedLevel
+  // entity.save()
 
   //init stats
   const stats = getInitStats()
@@ -69,14 +68,12 @@ export function handleInviterBounty(event: InviterBountyEvent): void {
   inviter.totalEarnedAsInviter = inviter.totalEarnedAsInviter.plus(event.params.bountyPaid)
   stats.totalInvitersBounties = stats.totalInvitersBounties.plus(event.params.bountyPaid)
 
-  inviter.invitees.push(event.params.invitee)
-
   inviter.totalApprovedInvites = inviter.totalApprovedInvites.plus(BigInt.fromI32(1))
   stats.totalApprovedInvites = stats.totalApprovedInvites.plus(BigInt.fromI32(1))
 
-  const index = inviter.pending.indexOf(event.params.invitee, 0)
+  const index = inviter.pending.indexOf(event.params.invitee.toHexString(), 0)
   if (index > -1) {
-    inviter.pending.splice(index, 1)
+    inviter.pending = inviter.pending.splice(index, 1)
     inviter.totalPending = inviter.totalPending.minus(BigInt.fromI32(1))
     stats.totalPending = stats.totalPending.minus(BigInt.fromI32(1))
   }
@@ -86,13 +83,13 @@ export function handleInviterBounty(event: InviterBountyEvent): void {
 
   //update invitee
   invitee.bountyPaid = true
-  invitee.invitedBy = event.params.inviter
+  invitee.invitedBy = event.params.inviter.toHexString()
   invitee.earnedAsInvitee = event.params.bountyPaid.div(BigInt.fromI32(2))
 
   invitee.save()
 }
 
-function getInitUser(id: string, timestamp: BigInt) {
+function getInitUser(id: string, timestamp: BigInt): User {
   let user = User.load(id)
   if (user == null) {
     user = new User(id)
@@ -105,12 +102,13 @@ function getInitUser(id: string, timestamp: BigInt) {
     // todo: handle levels if needed
     user.joinedAt = timestamp
     user.earnedAsInvitee = BigInt.zero()
+    user.pending = new Array<string>(0)
   }
 
   return user
 }
 
-function getInitStats() {
+function getInitStats(): InvitesStats {
   let stats = InvitesStats.load("stats")
   if (stats == null) {
     stats = new InvitesStats("stats")

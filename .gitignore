@@ -6,3 +6,5 @@ mainnet/build
 mainnet/generated
 mainnet/docker/data
 fuse2/node_modules
+fuse2/build
+fuse2/generated
