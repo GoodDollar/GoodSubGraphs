@@ -23,7 +23,7 @@ export function handleInviteeJoined(event: InviteeJoinedEvent): void {
 
   //init inviter if exists
   if (event.params.inviter.toHexString() != ADDRESS_ZERO) {
-    const inviter = getInitUser(event.params.invitee.toHexString(), event.block.timestamp)
+    const inviter = getInitUser(event.params.inviter.toHexString(), event.block.timestamp)
 
     //update inviter and stats    
     inviter.pending.push(event.params.invitee.toHexString())
@@ -62,7 +62,7 @@ export function handleInviterBounty(event: InviterBountyEvent): void {
   const invitee = getInitUser(event.params.invitee.toHexString(), event.block.timestamp)
 
   //init inviter
-  const inviter = getInitUser(event.params.invitee.toHexString(), event.block.timestamp)
+  const inviter = getInitUser(event.params.inviter.toHexString(), event.block.timestamp)
 
   inviter.level = event.params.inviterLevel
   if(event.params.earnedLevel)
