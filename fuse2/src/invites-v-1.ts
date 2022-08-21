@@ -64,6 +64,12 @@ export function handleInviterBounty(event: InviterBountyEvent): void {
   //init inviter
   const inviter = getInitUser(event.params.invitee.toHexString(), event.block.timestamp)
 
+  inviter.level = event.params.inviterLevel
+  if(event.params.earnedLevel)
+  {
+    inviter.levelStarted = event.block.timestamp
+  }
+
   //update inviter and stats
   inviter.totalEarnedAsInviter = inviter.totalEarnedAsInviter.plus(event.params.bountyPaid)
   stats.totalInvitersBounties = stats.totalInvitersBounties.plus(event.params.bountyPaid)
@@ -99,10 +105,12 @@ function getInitUser(id: string, timestamp: BigInt): User {
     user.totalInvited = BigInt.zero()
     user.totalApprovedInvites = BigInt.zero()
     user.totalEarnedAsInviter = BigInt.zero()
-    // todo: handle levels if needed
+    user.level = BigInt.zero()
+    user.levelStarted = timestamp
     user.joinedAt = timestamp
     user.earnedAsInvitee = BigInt.zero()
     user.pending = new Array<string>(0)
+
   }
 
   return user
