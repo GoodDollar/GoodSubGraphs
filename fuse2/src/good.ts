@@ -20,12 +20,13 @@ export function handleStateProof(event: StateHashProof): void {
     if(curBlockchainProof === null)
     {
         curBlockchainProof  = new StateProof(event.params.user.toHexString()+"_"+event.params.blockchain)
-        curBlockchainProof.balance = BigInt.zero()
+        curBlockchainProof.balance = BigInt.zero()        
     }
     let prevBlockchainBalance = curBlockchainProof.balance
     curBlockchainProof.account = event.params.user.toHexString()
     curBlockchainProof.balance = event.params.repBalance
     curBlockchainProof.blockchain = event.params.blockchain
+    curBlockchainProof.timestamp = event.block.timestamp
     curBlockchainProof.save()
     
     
