@@ -377,3 +377,33 @@ dataSources:
         - event: StakeWithdraw(indexed address,address,uint256)
           handler: handleStakeWithdrawV2
       file: ./src/mapping.ts
+
+  - kind: ethereum
+    name: GOOD
+    network: mainnet
+    source:
+      address: "0x603b8c0f110e037b51a381cbcacabb8d6c6e4543"
+      abi: GReputation
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Balance
+        - StateHash
+        - StateProof
+      abis:
+        - name: GReputation
+          file: ./abis/GReputation.json
+      eventHandlers:
+        - event: DelegateVotesChanged(indexed address,indexed address,uint256,uint256)
+          handler: handleVotesDelegated
+        - event: StateHash(string,bytes32,uint256)
+          handler: handleStateHash
+        - event: StateHashProof(string,indexed address,uint256)
+          handler: handleStateProof
+        - event: Mint(indexed address,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,uint256)
+          handler: handleBurn
+      file: ./src/good.ts

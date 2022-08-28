@@ -210,7 +210,8 @@ function _handleStakeOperation(blockTimestamp:BigInt,contract:Address, staker:Ad
   if(stakingHistory == null)
   {
     stakingHistory = new StakeHistory(dayTimestamp.toString())
-    stakingHistory.totalUSDStaked = BigDecimal.zero()          
+    stakingHistory.totalUSDStaked = BigDecimal.zero()
+    stakingHistory.stakingContracts = new Array<string>(0) 
   }
 
   let supporter = Supporter.load(staker.toHexString())

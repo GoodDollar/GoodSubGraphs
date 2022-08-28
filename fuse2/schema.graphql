@@ -1,0 +1,88 @@
+type Minter @entity {
+  id: ID! # address
+  totalMintCap: BigInt!
+  perTxCap: BigInt!
+  bps: BigInt!
+  isRewardsRole: BigInt!
+  totalMinted: BigInt!
+  totalBurned: BigInt!
+}
+
+type MintBurnStats @entity {
+  id: ID!
+  totalMintCap: BigInt
+  totalMinted: BigInt
+  totalMintDebt: BigInt
+  totalRewards: BigInt
+  totalBurned: BigInt
+}
+
+type InviteeJoined @entity {
+  id: ID!
+  inviter: Bytes! # address
+  invitee: Bytes! # address
+}
+
+type InviterBounty @entity {
+  id: ID!
+  inviter: Bytes! # address
+  invitee: Bytes! # address
+  bountyPaid: BigInt! # uint256
+  inviterLevel: BigInt! # uint256
+  earnedLevel: Boolean! # bool
+}
+
+type InvitesStats @entity {
+  id: ID!
+  totalApprovedInvites: BigInt!
+  totalPending: BigInt!
+  totalInvitersBounties: BigInt!
+  totalInvited: BigInt!
+}
+
+type User @entity {
+  id: ID!
+  invitedBy: User
+  bountyPaid: Boolean!
+  invitees: [User!]! @derivedFrom(field: "invitedBy")
+  pending: [User!]!
+  level: BigInt!
+  levelStarted: BigInt!
+  totalPending: BigInt!
+  totalInvited: BigInt! # total invited (= totalApproved + pending)
+  totalApprovedInvites: BigInt! # total joined via inviter and approved
+  totalEarnedAsInviter: BigInt!
+  joinedAt: BigInt!
+  earnedAsInvitee: BigInt!
+}
+
+type GoodBalance @entity {
+ id: ID!
+ "GOOD tokens minted on current blockchain"
+ coreBalance: BigInt!
+ "Delegated + Own undelegated GOOD on current blockchain"
+ activeVotes: BigInt!
+ "total activeVotes on other blockchains from state proof"
+ blockchainsBalance: BigInt!
+ "total voting power = activeVotes + blockchainsBalance"
+ totalVotes: BigInt!
+ stateProofs: [StateProof!]! @derivedFrom(field: "account")
+ delegatees: [GoodBalance!]! @derivedFrom(field: "delegator")
+ delegator: GoodBalance
+}
+
+type StateProof @entity {
+  id: ID!
+  blockchain: String!
+  account: GoodBalance!
+  balance: BigInt!
+  timestamp: BigInt!
+}
+
+type StateHash @entity {
+  id: ID!
+  timestamp: BigInt!
+  blockchain: String!
+  merkleRoot: Bytes!
+  totalSupply: BigInt!
+}

@@ -1,0 +1,291 @@
+[
+  {
+    "type": "event",
+    "name": "InviteeJoined",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "inviter",
+        "internalType": "address",
+        "indexed": true
+      },
+      {
+        "type": "address",
+        "name": "invitee",
+        "internalType": "address",
+        "indexed": true
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "InviterBounty",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "inviter",
+        "internalType": "address",
+        "indexed": true
+      },
+      {
+        "type": "address",
+        "name": "invitee",
+        "internalType": "address",
+        "indexed": true
+      },
+      {
+        "type": "uint256",
+        "name": "bountyPaid",
+        "internalType": "uint256",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "inviterLevel",
+        "internalType": "uint256",
+        "indexed": false
+      },
+      {
+        "type": "bool",
+        "name": "earnedLevel",
+        "internalType": "bool",
+        "indexed": false
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "bool", "name": "", "internalType": "bool" }],
+    "name": "active",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [
+      { "type": "address", "name": "", "internalType": "address payable" }
+    ],
+    "name": "avatar",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "outputs": [
+      { "type": "uint256", "name": "bounty", "internalType": "uint256" }
+    ],
+    "name": "bountyFor",
+    "inputs": [
+      { "type": "address", "name": "_invitee", "internalType": "address" }
+    ]
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "bool", "name": "", "internalType": "bool" }],
+    "name": "canCollectBountyFor",
+    "inputs": [
+      { "type": "address", "name": "_invitee", "internalType": "address" }
+    ]
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "address", "name": "", "internalType": "address" }],
+    "name": "codeToUser",
+    "inputs": [{ "type": "bytes32", "name": "", "internalType": "bytes32" }]
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "outputs": [],
+    "name": "collectBounties",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "outputs": [],
+    "name": "end",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [
+      { "type": "address[]", "name": "", "internalType": "address[]" }
+    ],
+    "name": "getInvitees",
+    "inputs": [
+      { "type": "address", "name": "_inviter", "internalType": "address" }
+    ]
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "uint256", "name": "", "internalType": "uint256" }],
+    "name": "getPendingBounties",
+    "inputs": [
+      { "type": "address", "name": "_inviter", "internalType": "address" }
+    ]
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [
+      { "type": "address[]", "name": "", "internalType": "address[]" }
+    ],
+    "name": "getPendingInvitees",
+    "inputs": [
+      { "type": "address", "name": "_inviter", "internalType": "address" }
+    ]
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [
+      { "type": "address", "name": "", "internalType": "contract cERC20" }
+    ],
+    "name": "goodDollar",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [
+      { "type": "address", "name": "", "internalType": "contract IIdentity" }
+    ],
+    "name": "identity",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "outputs": [],
+    "name": "initialize",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "_avatar",
+        "internalType": "address payable"
+      },
+      { "type": "address", "name": "_identity", "internalType": "address" },
+      { "type": "address", "name": "_gd", "internalType": "address" },
+      { "type": "uint256", "name": "level0Bounty", "internalType": "uint256" }
+    ]
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "outputs": [],
+    "name": "join",
+    "inputs": [
+      { "type": "bytes32", "name": "_myCode", "internalType": "bytes32" },
+      { "type": "bytes32", "name": "_inviterCode", "internalType": "bytes32" }
+    ]
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "bool", "name": "", "internalType": "bool" }],
+    "name": "levelExpirationEnabled",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [
+      { "type": "uint256", "name": "toNext", "internalType": "uint256" },
+      { "type": "uint256", "name": "bounty", "internalType": "uint256" },
+      { "type": "uint256", "name": "daysToComplete", "internalType": "uint256" }
+    ],
+    "name": "levels",
+    "inputs": [{ "type": "uint256", "name": "", "internalType": "uint256" }]
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "address", "name": "", "internalType": "address" }],
+    "name": "owner",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "outputs": [],
+    "name": "setActive",
+    "inputs": [{ "type": "bool", "name": "_active", "internalType": "bool" }]
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "outputs": [],
+    "name": "setLevel",
+    "inputs": [
+      { "type": "uint256", "name": "_lvl", "internalType": "uint256" },
+      { "type": "uint256", "name": "_toNext", "internalType": "uint256" },
+      { "type": "uint256", "name": "_bounty", "internalType": "uint256" },
+      {
+        "type": "uint256",
+        "name": "_daysToComplete",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "outputs": [],
+    "name": "setLevelExpirationEnabled",
+    "inputs": [{ "type": "bool", "name": "_isEnabled", "internalType": "bool" }]
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": "totalApprovedInvites",
+        "internalType": "uint256"
+      },
+      {
+        "type": "uint256",
+        "name": "totalBountiesPaid",
+        "internalType": "uint256"
+      },
+      { "type": "uint256", "name": "totalInvited", "internalType": "uint256" }
+    ],
+    "name": "stats",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [
+      { "type": "address", "name": "invitedBy", "internalType": "address" },
+      { "type": "bytes32", "name": "inviteCode", "internalType": "bytes32" },
+      { "type": "bool", "name": "bountyPaid", "internalType": "bool" },
+      { "type": "uint256", "name": "level", "internalType": "uint256" },
+      { "type": "uint256", "name": "levelStarted", "internalType": "uint256" },
+      {
+        "type": "uint256",
+        "name": "totalApprovedInvites",
+        "internalType": "uint256"
+      },
+      { "type": "uint256", "name": "totalEarned", "internalType": "uint256" },
+      { "type": "uint256", "name": "joinedAt", "internalType": "uint256" }
+    ],
+    "name": "users",
+    "inputs": [{ "type": "address", "name": "", "internalType": "address" }]
+  },
+  {
+    "type": "function",
+    "stateMutability": "pure",
+    "outputs": [{ "type": "string", "name": "", "internalType": "string" }],
+    "name": "version",
+    "inputs": []
+  }
+]
