@@ -17,21 +17,6 @@ type MintBurnStats @entity {
   totalBurned: BigInt
 }
 
-type InviteeJoined @entity {
-  id: ID!
-  inviter: Bytes! # address
-  invitee: Bytes! # address
-}
-
-type InviterBounty @entity {
-  id: ID!
-  inviter: Bytes! # address
-  invitee: Bytes! # address
-  bountyPaid: BigInt! # uint256
-  inviterLevel: BigInt! # uint256
-  earnedLevel: Boolean! # bool
-}
-
 type InvitesStats @entity {
   id: ID!
   totalApprovedInvites: BigInt!
@@ -69,6 +54,8 @@ type GoodBalance @entity {
  stateProofs: [StateProof!]! @derivedFrom(field: "account")
  delegatees: [GoodBalance!]! @derivedFrom(field: "delegator")
  delegator: GoodBalance
+ memberSince: BigInt!
+ lastUpdate: BigInt!
 }
 
 type StateProof @entity {
