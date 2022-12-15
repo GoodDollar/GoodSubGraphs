@@ -4,10 +4,10 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ gooddollar/GoodDollarFuse2",
-    "create-local": "graph create --node http://localhost:8020/ gooddollar/GoodSubGraphsFuse2",
-    "remove-local": "graph remove --node http://localhost:8020/ gooddollar/GoodSubGraphsFuse2",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 gooddollar/GoodSubGraphsFuse2"
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ gooddollar/gooddollarfuse2",
+    "create-local": "graph create --node http://localhost:8020/ gooddollar/gooddollarfuse2",
+    "remove-local": "graph remove --node http://localhost:8020/ gooddollar/gooddollarfuse2",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 gooddollar/gooddollarfuse2"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.32.0",

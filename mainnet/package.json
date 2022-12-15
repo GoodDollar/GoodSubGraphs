@@ -2,11 +2,11 @@
   "name": "GoodSubGraphs",
   "license": "UNLICENSED",
   "scripts": {
-    "copyGood": "cp ../fuse2/src/good.ts src && cp ../fuse2/abis/GReputation.json abis",
+    "copyGood": "cp ../fuse2/src/good.ts src && cp ../fuse2/abis/GReputation.json abis && cp ../fuse2/schema.graphql good.graphql && cat warn.graphql base.graphql good.graphql warn.graphql > schema.graphql",
     "codegen": "yarn copyGood && graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --product hosted-service GoodDollar/GoodSubGraphs",
-    "deployold": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ GoodDollar/GoodSubGraphs",
+    "deploy": "graph deploy --product hosted-service gooddollar/goodsubgraphs",
+    "deployold": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ gooddollar/goodsubgraphs",
     "create-local": "graph create --node http://localhost:8020/ GoodDollar/GoodSubGraphs2",
     "remove-local": "graph remove --node http://localhost:8020/ GoodDollar/GoodSubGraphs2",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 GoodDollar/GoodSubGraphs2"

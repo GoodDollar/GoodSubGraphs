@@ -30,15 +30,16 @@ export function handleStateProof(event: StateHashProof): void {
 
 
     //in case of root state we dont have to do any updates, as it triggers Mint event
-    if (event.params.blockchain === "rootState") {
+    if (event.params.blockchain == "rootState") {
         return;
     }
-    const balance = getInitBalance(event.params.user.toHexString(), event.block.timestamp)
-    balance.blockchainsBalance = balance.blockchainsBalance.minus(prevBlockchainBalance).plus(event.params.repBalance)
-    balance.totalVotes = balance.activeVotes.plus(balance.blockchainsBalance)
+    else {
+        const balance = getInitBalance(event.params.user.toHexString(), event.block.timestamp)
+        balance.blockchainsBalance = balance.blockchainsBalance.minus(prevBlockchainBalance).plus(event.params.repBalance)
+        balance.totalVotes = balance.activeVotes.plus(balance.blockchainsBalance)
 
-
-    balance.save()
+        balance.save()
+    }
 }
 
 export function handleMint(event: Mint): void {
@@ -61,23 +62,20 @@ export function handleVotesDelegated(event: DelegateVotesChanged): void {
     const isDelegating = event.params.newBalance.gt(event.params.previousBalance)
     if (isDelegating) //this event fires also when removing delegator
     {
-        delegate.delegator = delegator.id
-        if (delegator.id === delegate.id) {
-            // this means both records are the same, we need to make sure we change and save just one, or change both with exact data and save
-            // otherwise when we save they overwrite each other
-            delegator.delegator = delegator.id
-        }
+        delegator.delegatee = delegate.id
         //in case they are not the same record, save the updated delegate record
-        else {
+        if (delegator.id !== delegate.id) {
+            // this means both records are the same, we need to make sure we change and save just one, or change both with exact data and save
+            // otherwise when we save they overwrite each other            
             //we dont change delegate balances here because another event will be fired if delegate was its own delegator
-            delegate.save()
-        }
+            delegator.save()
+        }        
     }
 
-    delegator.activeVotes = event.params.newBalance
-    delegator.totalVotes = delegator.activeVotes.plus(delegator.blockchainsBalance)
+    delegate.activeVotes = event.params.newBalance
+    delegate.totalVotes = delegator.activeVotes.plus(delegator.blockchainsBalance)
 
-    delegator.save()
+    delegate.save()
 
 
 
