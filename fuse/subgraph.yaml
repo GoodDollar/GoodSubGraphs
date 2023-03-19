@@ -184,6 +184,29 @@ dataSources:
       file: ./src/mapping.ts
 
   - kind: ethereum/contract
+    name: IdentityV2
+    network: fuse
+    source:
+      address: '0x2F9C28de9e6d44b71B91b8BA337A5D82e308E7BE'
+      abi: Identity
+      startBlock: 22022903
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Citizen
+      abis:
+        - name: Identity
+          file: ./node_modules/@gooddollar/goodcontracts/build/contracts/Identity.json
+      eventHandlers:
+        - event: WhitelistedAdded(indexed address)
+          handler: handleWhitelistedAdded
+        - event: WhitelistedRemoved(indexed address)
+          handler: handleWhitelistedRemoved
+      file: ./src/mapping.ts
+
+  - kind: ethereum/contract
     name: FuseStaking
     network: fuse
     source:

@@ -73,7 +73,7 @@ export function handleVotesDelegated(event: DelegateVotesChanged): void {
     }
 
     delegate.activeVotes = event.params.newBalance
-    delegate.totalVotes = delegator.activeVotes.plus(delegator.blockchainsBalance)
+    delegate.totalVotes = delegate.activeVotes.plus(delegate.blockchainsBalance)
 
     delegate.save()
 
