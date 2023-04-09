@@ -15,6 +15,7 @@ type ReserveHistory @entity {
   interestReceivedCDAI: BigDecimal!
   interestReceivedDAI: BigDecimal!
   volumeDAI: BigDecimal!
+  volumeGD: BigDecimal!
 }
 
 type StakeHistory @entity {

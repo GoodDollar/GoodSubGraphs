@@ -74,10 +74,12 @@ function _updateReserveHistory(blockTimestamp: BigInt, blockNumber: BigInt,marke
 
     //keep track of buy/sell volume in cDAI
     let toAddVolumeCDAI = isSell ? buysellEvent.params.returnAmount : buysellEvent.params.amount
+    let toAddVolumeGD = isSell ? reserveHistory.totalSupply.minus(buysellEvent.params.totalSupply) : buysellEvent.params.totalSupply.minus(reserveHistory.totalSupply)
     let toAddVolumeDAI = cdaiRate
     .times(toAddVolumeCDAI)
     .div(e18).toBigDecimal().div(e18.toBigDecimal()) //return price in dai decimals
     reserveHistory.volumeDAI = reserveHistory.volumeDAI.plus(toAddVolumeDAI)
+    reserveHistory.volumeGD = reserveHistory.volumeGD.plus(toAddVolumeGD.toBigDecimal().div(BigDecimal.fromString('100')))
   }
 
   reserveHistory.totalSupply = tokenContract.totalSupply()
