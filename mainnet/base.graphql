@@ -9,11 +9,12 @@ type ReserveHistory @entity {
   marketCap: BigDecimal
   reserveRatio: BigDecimal
   reserveValueInDAI: BigDecimal
-  totalSupply: BigInt
+  totalSupply: BigInt!
   ubiMintedFromExpansion: BigDecimal!
   ubiMintedFromInterest: BigDecimal!
   interestReceivedCDAI: BigDecimal!
   interestReceivedDAI: BigDecimal!
+  volumeDAI: BigDecimal!
 }
 
 type StakeHistory @entity {

@@ -31,22 +31,23 @@ export function handleUBIMintedV2(event: UBIMintedV2): void {
 
 export function handleTokenSale(event: BalancesUpdated): void {
   // log.info('handleTokenSale got timestamp', [])
-  _updateReserveHistory(event.block.timestamp, event.block.number,event.address)
+  _updateReserveHistory(event.block.timestamp, event.block.number,event.address,null,null,null,event)
 }
 
 export function handleTokenSaleV2(event: BalancesUpdated): void {
   // log.info('handleTokenSale got timestamp', [])
-  _updateReserveHistory(event.block.timestamp, event.block.number,event.address)
+  _updateReserveHistory(event.block.timestamp, event.block.number,event.address,null,null,null,event)
 }
 
 //collects price + reserve data
 //each ReserveHistory record holds the last update for that day
-function _updateReserveHistory(blockTimestamp: BigInt, blockNumber: BigInt,marketMaker: Address, interestReceived: BigInt | null = null, gdExpansionMinted: BigInt | null = null, gdInterestMinted: BigInt | null = null): void {
+function _updateReserveHistory(blockTimestamp: BigInt, blockNumber: BigInt,marketMaker: Address, interestReceived: BigInt | null = null, gdExpansionMinted: BigInt | null = null, gdInterestMinted: BigInt | null = null, buysellEvent:BalancesUpdated | null = null): void {
   let reserveToken = Address.fromString('0x5d3a536e4d6dbd6114cc1ead35777bab948e3643') //cdai mainnet
   let tokenContract = GoodDollar.bind(Address.fromString('0x67c5870b4a41d4ebef24d2456547a03f1f3e094b')) //g$ mainnet
   let reserveContract = GoodMarketMaker.bind(marketMaker)
   let curPrice = reserveContract.currentPrice(reserveToken)
   let cdaiContract = cToken.bind(reserveToken)
+  let cdaiRate = cdaiContract.exchangeRateStored()
 
   let dayTimestamp = blockTimestamp.minus(blockTimestamp.mod(BigInt.fromI32(60 * 60 * 24)))
   log.debug('_updateReserveHistory got timestamp {}', [blockTimestamp.toString()])
@@ -64,10 +65,19 @@ function _updateReserveHistory(blockTimestamp: BigInt, blockNumber: BigInt,marke
 
   if (reserveHistory === null) {
     reserveHistory = new ReserveHistory(dayTimestamp.toString())
-    reserveHistory.ubiMintedFromExpansion = BigDecimal.zero()
-    reserveHistory.ubiMintedFromInterest = BigDecimal.zero()
-    reserveHistory.interestReceivedCDAI = BigDecimal.zero()
-    reserveHistory.interestReceivedDAI = BigDecimal.zero()
+  }
+
+  if(buysellEvent !== null)
+  {
+    // if last total supply is greater than event total supply then it is a sell otherwise it is a buy
+    let isSell = reserveHistory.totalSupply.gt(buysellEvent.params.totalSupply)
+
+    //keep track of buy/sell volume in cDAI
+    let toAddVolumeCDAI = isSell ? buysellEvent.params.returnAmount : buysellEvent.params.amount
+    let toAddVolumeDAI = cdaiRate
+    .times(toAddVolumeCDAI)
+    .div(e18).toBigDecimal().div(e18.toBigDecimal()) //return price in dai decimals
+    reserveHistory.volumeDAI = reserveHistory.volumeDAI.plus(toAddVolumeDAI)
   }
 
   reserveHistory.totalSupply = tokenContract.totalSupply()
@@ -76,8 +86,7 @@ function _updateReserveHistory(blockTimestamp: BigInt, blockNumber: BigInt,marke
 
   let reserveTokenData = reserveContract.reserveTokens(reserveToken)
 
-  let priceDAIWei = cdaiContract
-    .exchangeRateStored()
+  let priceDAIWei = cdaiRate
     .times(curPrice)
     .div(e18) //return price in dai wei
 
@@ -85,8 +94,7 @@ function _updateReserveHistory(blockTimestamp: BigInt, blockNumber: BigInt,marke
     reserveHistory.ubiMintedFromExpansion = reserveHistory.ubiMintedFromExpansion.plus(gdExpansionMinted.toBigDecimal().div(BigInt.fromI32(100).toBigDecimal()))
     reserveHistory.ubiMintedFromInterest = reserveHistory.ubiMintedFromInterest.plus(gdInterestMinted.toBigDecimal().div(BigInt.fromI32(100).toBigDecimal()));
     reserveHistory.interestReceivedCDAI = reserveHistory.interestReceivedCDAI.plus(interestReceived.toBigDecimal().div(e8.toBigDecimal()));
-    reserveHistory.interestReceivedDAI = reserveHistory.interestReceivedDAI.plus(cdaiContract
-    .exchangeRateStored()
+    reserveHistory.interestReceivedDAI = reserveHistory.interestReceivedDAI.plus(cdaiRate
     .times(interestReceived)
     .div(e18).toBigDecimal().div(e18.toBigDecimal()))
   }
@@ -121,7 +129,7 @@ function _updateReserveHistory(blockTimestamp: BigInt, blockNumber: BigInt,marke
 
   reserveHistory.reserveRatio = reserveTokenData.value1.toBigDecimal().div(BigDecimal.fromString('1000000'))
   reserveHistory.reserveValueInDAI = reserveTokenData.value0
-    .times(cdaiContract.exchangeRateStored())
+    .times(cdaiRate)
     .toBigDecimal()
     .div(e18.toBigDecimal()) // results in dai wei
     .div(e18.toBigDecimal()) // results in dai decimals
