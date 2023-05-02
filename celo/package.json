@@ -1,0 +1,28 @@
+{
+  "name": "GoodSubGraphsFuse",
+  "license": "UNLICENSED",
+  "scripts": {
+    "gv": "graph version",
+    "codegen": "graph codegen",
+    "build": "yarn add @gooddollar/goodprotocol@latest && npm run contract-releases && graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ gooddollar/gooddollarfuse",
+    "create-local": "graph create --node http://localhost:8020/ GoodDollar/GoodDollarFuse",
+    "remove-local": "graph remove --node http://localhost:8020/ GoodDollar/GoodDollarFuse",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 GoodDollar/GoodDollarFuse",
+    "dev": "npm run codegen && npm run deploy-local",
+    "dev:nodemon": "node_modules/nodemon/bin/nodemon.js --exec 'npm run dev' --ignore build/ --ignore generated/ --ext 'ts,json,graphql,yaml'",
+    "contract-releases": "node scripts/get-contract-releases.js"
+  },
+  "dependencies": {
+    "@gooddollar/bridge-contracts": "^1.0.14",
+    "@gooddollar/goodcontracts": "^2.6.2",
+    "@gooddollar/goodprotocol": "^2.0.4",
+    "@graphprotocol/graph-cli": "^0.20.1",
+    "@graphprotocol/graph-ts": "^0.20.1"
+  },
+  "version": "0.0.0",
+  "devDependencies": {
+    "lodash.merge": "^4.6.2",
+    "nodemon": "^2.0.6"
+  }
+}
