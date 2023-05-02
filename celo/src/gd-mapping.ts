@@ -49,7 +49,7 @@ export function handleTransfer(event: Transfer): void {
 
 }
 
-function aggregateTransactionStatFromTransfer(event: Transfer, statistics: TransactionStat | null): void {
+function aggregateTransactionStatFromTransfer(event: Transfer, statistics: TransactionStat): void {
 
   if(enableLogs) log.info('aggregateTransactionStatFromTransfer event.params.from {}, event.params.to {}, event.params.value {}, event.transaction.hash {}', [event.params.from.toHex(), event.params.to.toHex(), event.params.value.toString(), event.transaction.hash.toHex()])
 

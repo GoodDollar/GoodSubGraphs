@@ -1,8 +1,4 @@
 import { BigInt, log, ethereum, Address, BigDecimal } from '@graphprotocol/graph-ts'
-import {
-  UBICollected
-} from '../generated/FuseStaking/FuseStaking'
-
 import { UBICollected as UBICollectedRecord, UBIHistory } from '../generated/schema'
 
 let ZERO = BigInt.fromI32(0)
