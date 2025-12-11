@@ -4,6 +4,7 @@ import { PaymentWithdraw } from '../generated/OneTimePayments/OneTimePayments'
 import { WalletStat, TransactionStat } from '../generated/schema'
 
 import { allAddresses } from '../scripts/releases'
+import { initCitizen, initStatistics } from './gd-mapping'
 
 // excluding contract TXs for clean count
 let contracts:Array<string> = allAddresses
@@ -35,7 +36,8 @@ function aggregateDailyStats(event: PaymentWithdraw):void {
   let statistics = TransactionStat.load(dayTimestampStr)
   if (statistics == null) {
     statistics = new TransactionStat(dayTimestampStr)
-    statistics.dayStartBlockNumber = event.block.number
+    initStatistics(statistics)
+    statistics.dayStartBlockNumber = event.block.number    
   }
 
   if(enableLogs) log.info('aggregated count:{} countClean:{} value:{} valueClean:{}, totalInCirculation:{}', [statistics.transactionsCount.toString(), statistics.transactionsCountClean.toString(), statistics.transactionsValue.toString(), statistics.transactionsValueClean.toString(), statistics.totalInCirculation.toString()])
@@ -48,9 +50,8 @@ function aggregateDailyStats(event: PaymentWithdraw):void {
 function aggregateCitizenStats(event: PaymentWithdraw):void {
   let citizenTo = WalletStat.load(event.params.to.toHex())
   if (citizenTo == null) {
-    citizenTo = new WalletStat(event.params.to.toHex())
-    citizenTo.dateAppeared = event.block.timestamp
-    citizenTo.claimStreak = BigInt.fromI32(0)
+    citizenTo = initCitizen(event.params.to.toHexString())
+    citizenTo.dateAppeared = event.block.timestamp    
   }
 
   citizenTo.lastTransactionTo = event.block.timestamp 
@@ -67,9 +68,8 @@ function aggregateCitizenStats(event: PaymentWithdraw):void {
 
   let citizenFrom = WalletStat.load(event.params.from.toHex())
   if (citizenFrom == null) {
-    citizenFrom = new WalletStat(event.params.from.toHex())
+    citizenFrom = initCitizen(event.params.from.toHexString())
     citizenFrom.dateAppeared = event.block.timestamp
-    citizenFrom.claimStreak = BigInt.fromI32(0)
   }
 
   citizenFrom.lastTransactionFrom = event.block.timestamp 

@@ -13,6 +13,45 @@ const enableLogs = false;
 // excluding contract TXs for clean count
 let contracts:Array<string> = allAddresses
 
+export function initCitizen(id: string): WalletStat {
+  const citizen = new WalletStat(id)
+
+  citizen.balance = ZERO
+  citizen.claimStreak = ZERO
+  citizen.dateAppeared = ZERO
+  citizen.dateJoined = ZERO
+  citizen.isActiveUser = false
+  citizen.isWhitelisted = false
+  citizen.lastClaimed = ZERO
+  citizen.lastTransactionFrom = ZERO
+  citizen.lastTransactionTo = ZERO
+  citizen.longestClaimStreak = ZERO
+  citizen.totalClaimedCount = ZERO
+  citizen.totalClaimedValue = ZERO
+  citizen.totalTransactionsCount = ZERO
+  citizen.totalTransactionsCountClean = ZERO
+  citizen.totalTransactionsValue = ZERO
+  citizen.totalTransactionsValueClean = ZERO
+  citizen.outTransactionsCount = ZERO
+  citizen.outTransactionsCountClean = ZERO
+  citizen.outTransactionsValue = ZERO
+  citizen.outTransactionsValueClean = ZERO
+  citizen.inTransactionsCount = ZERO
+  citizen.inTransactionsCountClean = ZERO
+  citizen.inTransactionsValue = ZERO
+  citizen.inTransactionsValueClean = ZERO
+
+  return citizen
+}
+export function initStatistics(statistics: TransactionStat): void {
+  statistics.dayStartBlockNumber = ZERO
+  statistics.transactionsCount = ZERO
+  statistics.transactionsCountClean = ZERO
+  statistics.transactionsValue = ZERO
+  statistics.transactionsValueClean = ZERO
+  statistics.totalInCirculation = ZERO
+
+} 
 export function handleTransfer(event: Transfer): void {
 
   if(enableLogs) log.info('handleTransferEvent event.params.from {}, event.params.to {}, event.params.value {}, event.transaction.hash {}', [event.params.from.toHex(), event.params.to.toHex(), event.params.value.toString(), event.transaction.hash.toHex()])
@@ -20,7 +59,9 @@ export function handleTransfer(event: Transfer): void {
   let aggregated = TransactionStat.load('aggregated')
 
   if (aggregated == null) {
-    aggregated = new TransactionStat('aggregated')
+    aggregated = new TransactionStat('aggregated')    
+    initStatistics(aggregated)
+    aggregated.dayStartBlockNumber = event.block.number
   }
 
   aggregateTransactionStatFromTransfer(event, aggregated)
@@ -29,6 +70,9 @@ export function handleTransfer(event: Transfer): void {
   if (statistics == null) {
     statistics = new GlobalStatistics('statistics')
     statistics.TransactionStat = aggregated.id
+    statistics.uniqueClaimers = ZERO
+    statistics.totalUBIDistributed = ZERO
+    statistics.totalClaims = ZERO
     statistics.save()
   }
 
@@ -41,7 +85,8 @@ export function handleTransfer(event: Transfer): void {
   let dailyStatistics = TransactionStat.load(dayTimestampStr)
   if (dailyStatistics == null) {
     dailyStatistics = new TransactionStat(dayTimestampStr)
-    dailyStatistics.dayStartBlockNumber = event.block.number
+    initStatistics(dailyStatistics)
+    dailyStatistics.dayStartBlockNumber = event.block.number    
   }
   aggregateTransactionStatFromTransfer(event, dailyStatistics)
   
@@ -49,7 +94,7 @@ export function handleTransfer(event: Transfer): void {
 
 }
 
-function aggregateTransactionStatFromTransfer(event: Transfer, statistics: TransactionStat | null): void {
+function aggregateTransactionStatFromTransfer(event: Transfer, statistics: TransactionStat): void {
 
   if(enableLogs) log.info('aggregateTransactionStatFromTransfer event.params.from {}, event.params.to {}, event.params.value {}, event.transaction.hash {}', [event.params.from.toHex(), event.params.to.toHex(), event.params.value.toString(), event.transaction.hash.toHex()])
 
@@ -86,22 +131,7 @@ function aggregateCitizenFromTransfer(event: Transfer): void {
 
   let citizenFrom = WalletStat.load(event.params.from.toHex())
   if (citizenFrom == null) {
-    citizenFrom = new WalletStat(event.params.from.toHexString())
-    citizenFrom.claimStreak = ZERO
-    citizenFrom.dateAppeared = event.block.timestamp
-    citizenFrom.outTransactionsCount = ZERO
-    citizenFrom.outTransactionsCountClean = ZERO
-    citizenFrom.outTransactionsValue = ZERO
-    citizenFrom.outTransactionsValueClean = ZERO
-    citizenFrom.inTransactionsCount = ZERO
-    citizenFrom.inTransactionsCountClean = ZERO
-    citizenFrom.inTransactionsValue = ZERO
-    citizenFrom.inTransactionsValueClean = ZERO
-    citizenFrom.balance = ZERO
-    citizenFrom.totalTransactionsValueClean = ZERO
-    citizenFrom.totalTransactionsCount = ZERO
-    citizenFrom.totalTransactionsValue = ZERO
-    citizenFrom.claimStreak = ZERO
+    citizenFrom = initCitizen(event.params.from.toHexString())
   }
 
   citizenFrom.outTransactionsCount = citizenFrom.outTransactionsCount.plus(BigInt.fromI32(1))
@@ -133,23 +163,7 @@ function aggregateCitizenFromTransfer(event: Transfer): void {
 
   let citizenTo = WalletStat.load(event.params.to.toHexString())
   if (citizenTo == null) {
-    citizenTo = new WalletStat(event.params.to.toHexString())
-    citizenTo.claimStreak = ZERO
-    citizenTo.dateAppeared = event.block.timestamp
-    citizenTo.outTransactionsCount = ZERO
-    citizenTo.outTransactionsCountClean = ZERO
-    citizenTo.outTransactionsValue = ZERO
-    citizenTo.outTransactionsValueClean = ZERO
-    citizenTo.inTransactionsCount = ZERO
-    citizenTo.inTransactionsCountClean = ZERO
-    citizenTo.inTransactionsValue = ZERO
-    citizenTo.inTransactionsValueClean = ZERO
-    citizenTo.balance = ZERO
-    citizenTo.totalTransactionsValueClean = ZERO
-    citizenTo.totalTransactionsCount = ZERO
-    citizenTo.totalTransactionsValue = ZERO
-    citizenTo.totalTransactionsValueClean = ZERO
-    citizenTo.claimStreak = ZERO
+    citizenTo = initCitizen(event.params.to.toHexString())
   }
 
   citizenTo.inTransactionsCount = citizenTo.inTransactionsCount.plus(BigInt.fromI32(1))

@@ -1,11 +1,11 @@
-type DailyUBI @entity {
+type DailyUBI @entity(immutable: false) {
   id: ID!
   pool: BigInt
   quota: BigInt
   activeUsers: BigInt
-  totalUBIDistributed: BigInt
-  totalClaims: BigInt
-  newClaimers: BigInt
+  totalUBIDistributed: BigInt!
+  totalClaims: BigInt!
+  newClaimers: BigInt!
   timestamp: BigInt
   ubiSchemeAddress: Bytes
   balance: BigInt
@@ -13,53 +13,53 @@ type DailyUBI @entity {
   dayInCycle: BigInt
 }
 
-type WalletStat @entity {
+type WalletStat @entity(immutable: false) {
   id: ID!
   dateAppeared: BigInt
-  balance: BigInt
-  inTransactionsCount: BigInt
-  inTransactionsCountClean: BigInt
-  inTransactionsValue: BigInt
-  inTransactionsValueClean: BigInt
-  outTransactionsCount: BigInt
-  outTransactionsCountClean: BigInt
-  outTransactionsValue: BigInt
-  outTransactionsValueClean: BigInt
-  totalTransactionsCount: BigInt
-  totalTransactionsCountClean: BigInt
-  totalTransactionsValue: BigInt
-  totalTransactionsValueClean: BigInt
-  lastClaimed: BigInt
-  totalClaimedCount: BigInt
-  totalClaimedValue: BigInt
+  balance: BigInt!
+  inTransactionsCount: BigInt!
+  inTransactionsCountClean: BigInt!
+  inTransactionsValue: BigInt!
+  inTransactionsValueClean: BigInt!
+  outTransactionsCount: BigInt!
+  outTransactionsCountClean: BigInt!
+  outTransactionsValue: BigInt!
+  outTransactionsValueClean: BigInt!
+  totalTransactionsCount: BigInt!
+  totalTransactionsCountClean: BigInt!
+  totalTransactionsValue: BigInt!
+  totalTransactionsValueClean: BigInt!
+  lastClaimed: BigInt!
+  totalClaimedCount: BigInt!
+  totalClaimedValue: BigInt!
   claimStreak: BigInt!
-  longestClaimStreak: BigInt
+  longestClaimStreak: BigInt!
   isWhitelisted: Boolean
   isActiveUser: Boolean
-  dateJoined: BigInt
+  dateJoined: BigInt!
   lastTransactionFrom: BigInt
   lastTransactionTo: BigInt
 }
 
-type TransactionStat @entity {
+type TransactionStat @entity(immutable: false) {
   id: ID!
   dayStartBlockNumber: BigInt
-  transactionsCount: BigInt
-  transactionsCountClean: BigInt
-  transactionsValue: BigInt
-  transactionsValueClean: BigInt
-  totalInCirculation: BigInt
+  transactionsCount: BigInt!
+  transactionsCountClean: BigInt!
+  transactionsValue: BigInt!
+  transactionsValueClean: BigInt!
+  totalInCirculation: BigInt!
 }
 
-type GlobalStatistics @entity {
+type GlobalStatistics @entity(immutable: false) {
   id: ID!
   TransactionStat: TransactionStat
-  totalUBIDistributed: BigInt
-  uniqueClaimers: BigInt
-  totalClaims: BigInt
+  totalUBIDistributed: BigInt!
+  uniqueClaimers: BigInt!
+  totalClaims: BigInt!
 }
 
-type UBICollected @entity {
+type UBICollected @entity(immutable: true) {
   id: ID!
   contract: Bytes, 
   block: BigInt
@@ -68,7 +68,7 @@ type UBICollected @entity {
   communityPool: BigDecimal!
 }
 
-type UBIHistory @entity {
+type UBIHistory @entity(immutable: false) {
   id: ID! 
   block: BigInt
   blockTimestamp: BigInt  

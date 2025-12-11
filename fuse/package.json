@@ -15,13 +15,15 @@
   },
   "dependencies": {
     "@gooddollar/goodcontracts": "^2.6.2",
-    "@gooddollar/goodprotocol": "^2.0.4",
-    "@graphprotocol/graph-cli": "^0.20.1",
-    "@graphprotocol/graph-ts": "^0.20.1"
+    "@gooddollar/goodprotocol": "^2.1.1",
+    "@graphprotocol/graph-cli": "^0.98.1",
+    "@graphprotocol/graph-ts": "^0.38.2"
   },
   "version": "0.0.0",
   "devDependencies": {
     "lodash.merge": "^4.6.2",
-    "nodemon": "^2.0.6"
-  }
+    "nodemon": "^2.0.6",
+    "source-map-support": "^0.5.21"
+  },
+  "packageManager": "yarn@4.12.0"
 }

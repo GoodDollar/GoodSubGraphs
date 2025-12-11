@@ -1,4 +1,4 @@
-specVersion: 0.0.2
+specVersion: 1.2.0
 schema:
   file: ./schema.graphql
 dataSources:
@@ -9,9 +9,10 @@ dataSources:
       address: '0xAACbaaB8571cbECEB46ba85B5981efDB8928545e'
       abi: UBIScheme
       startBlock: 6246324
+      endBlock: 10056544
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - DailyUBI
@@ -35,10 +36,11 @@ dataSources:
     source:
       address: '0xD7aC544F8A570C4d8764c3AAbCF6870CBD960D0D'
       abi: UBIScheme
-      startBlock: 1076522
+      startBlock: 9376522
+      endBlock: 14547073
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - DailyUBI
@@ -63,9 +65,10 @@ dataSources:
       address: '0x87d77A30a6819860eB8332D293810ed7b510035A'
       abi: UBIScheme
       startBlock: 14149739
+      endBlock: 16007916
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - DailyUBI
@@ -90,9 +93,10 @@ dataSources:
       address: '0xd253A5203817225e9768C05E5996d642fb96bA86'
       abi: UBIScheme
       startBlock: 15750729
+      endBlock: 38729068
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - DailyUBI
@@ -115,6 +119,33 @@ dataSources:
       file: ./src/mapping.ts
 
   - kind: ethereum/contract
+    name: UBISchemeV3
+    network: fuse
+    source:
+      address: '0xd253A5203817225e9768C05E5996d642fb96bA86'
+      abi: UBISchemeV2
+      startBlock: 38729068
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - DailyUBI
+        - WalletStat
+        - GlobalStatistics
+      abis:
+        - name: UBISchemeV2
+          file: ./node_modules/@gooddollar/goodprotocol/artifacts/abis/UBISchemeV2.min.json
+        - name: GoodDollar
+          file: ./node_modules/@gooddollar/goodcontracts/build/contracts/GoodDollar.json
+      eventHandlers:
+          - event: UBICalculated(uint256,uint256,uint256)
+            handler: handleUBICalculatedV2
+          - event: UBIClaimed(indexed address,uint256)
+            handler: handleUBIClaimed
+      file: ./src/mapping.ts
+
+  - kind: ethereum/contract
     name: GoodDollar
     network: fuse
     source:
@@ -123,7 +154,7 @@ dataSources:
       startBlock: 6246324
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - GlobalStatistics
@@ -146,7 +177,7 @@ dataSources:
       startBlock: 6246324
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - GlobalStatistics
@@ -169,7 +200,7 @@ dataSources:
       startBlock: 6246324
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - Citizen
@@ -192,7 +223,7 @@ dataSources:
       startBlock: 22022903
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - Citizen
@@ -215,7 +246,7 @@ dataSources:
       startBlock: 8815068
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - UBIHistory

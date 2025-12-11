@@ -7,16 +7,66 @@ import {
   ActivatedUser,
   InactiveUserFished
 } from '../generated/UBIScheme/UBIScheme'
+import {
+  UBISchemeV2, 
+} from '../generated/UBISchemeV3/UBISchemeV2'
+
 
 import { GoodDollar } from '../generated/GoodDollar/GoodDollar'
 
 import { WhitelistedAdded, WhitelistedRemoved } from '../generated/Identity/Identity'
 
 import { DailyUBI, WalletStat, GlobalStatistics } from '../generated/schema'
+import { initCitizen } from './gd-mapping'
 
 let ZERO = BigInt.fromI32(0)
 const enableLogs = false;
 
+
+
+export function handleUBICalculatedV2(event: UBICalculated): void {
+  if (enableLogs)
+    log.info('handleUBICalculatedV2 event.params.day {}, event.params.dailyUbi {}, event.params.blockNumber {}', [
+      event.params.day.toString(),
+      event.params.dailyUbi.toString(),
+      event.params.blockNumber.toString()
+    ])
+
+  let ubiScheme = UBISchemeV2.bind(event.address)
+  let activeUsers = BigInt.zero()
+  if (event.params.day.gt(BigInt.zero())) {
+    let activeUsersResult = ubiScheme.try_claimDay(event.params.day.minus(BigInt.fromI32(1)))
+    if (activeUsersResult.reverted === false) activeUsers = activeUsersResult.value.getAmountOfClaimers()
+  }
+
+  let quota = event.params.dailyUbi
+  let pool = ubiScheme.dailyCyclePool()
+  if (enableLogs) log.info('dailyubi details: active: {} quota: {} pool: {}', [activeUsers.toString(), quota.toString(), pool.toString()])
+
+  let currentDay = getCurrentDay(event.address.toHexString(),event.block.timestamp)
+
+  
+  let gd = GoodDollar.bind(Address.fromString("0x495d133B938596C9984d462F007B676bDc57eCEC"))
+  let dailyUbi = DailyUBI.load(currentDay.toString())
+  if (dailyUbi == null) {
+    dailyUbi = new DailyUBI(currentDay.toString())
+    dailyUbi.newClaimers = BigInt.fromI32(1)
+    dailyUbi.totalUBIDistributed = ZERO
+    dailyUbi.totalClaims = ZERO
+  }
+
+  dailyUbi.ubiSchemeAddress = event.address
+  dailyUbi.pool = pool
+  dailyUbi.balance = gd.balanceOf(event.address)
+  dailyUbi.quota = quota
+  dailyUbi.activeUsers = activeUsers
+  dailyUbi.timestamp = event.block.timestamp
+
+  dailyUbi.cycleLength = ubiScheme.cycleLength()
+  dailyUbi.dayInCycle = ubiScheme.currentDayInCycle()
+
+  dailyUbi.save()
+}
 
 export function handleUBICalculated(event: UBICalculated): void {
   if(enableLogs) log.info('handleUBICalculated event.params.day {}, event.params.dailyUbi {}, event.params.blockNumber {}',
@@ -50,6 +100,9 @@ export function handleUBICalculated(event: UBICalculated): void {
   let dailyUbi = DailyUBI.load(currentDay.toString())
   if (dailyUbi == null) {
     dailyUbi = new DailyUBI(currentDay.toString())
+    dailyUbi.newClaimers = BigInt.fromI32(1)
+    dailyUbi.totalUBIDistributed = ZERO
+    dailyUbi.totalClaims = ZERO
   }
   dailyUbi.ubiSchemeAddress = event.address
   dailyUbi.pool = pool
@@ -88,12 +141,11 @@ export function handleWhitelistedAdded(event: WhitelistedAdded): void {
   let citizen = WalletStat.load(event.params.account.toHex())
 
   if (citizen == null) {
-    citizen = new WalletStat(event.params.account.toHex())
+    citizen = initCitizen(event.params.account.toHexString())
     citizen.dateAppeared = event.block.timestamp
-    citizen.claimStreak = ZERO
   }
 
-  if (citizen.dateJoined == null) {
+  if (citizen.dateJoined == ZERO) {
     citizen.dateJoined = event.block.timestamp
   }
 
@@ -106,16 +158,25 @@ export function handleWhitelistedAdded(event: WhitelistedAdded): void {
   let day = getCurrentDay(activeUbi, event.block.timestamp)
   let dailyUbi = DailyUBI.load(day.toString())
   if(dailyUbi == null)
+  {
     dailyUbi = new DailyUBI(day.toString())
+    dailyUbi.newClaimers = BigInt.fromI32(1)
+    dailyUbi.totalUBIDistributed = ZERO
+    dailyUbi.totalClaims = ZERO
+  }
 
-  dailyUbi.newClaimers = dailyUbi.newClaimers == null ? BigInt.fromI32(1) : dailyUbi.newClaimers.plus(BigInt.fromI32(1))
+  dailyUbi.newClaimers = dailyUbi.newClaimers.plus(BigInt.fromI32(1))
+
   dailyUbi.save()
 
   let statistics = GlobalStatistics.load('statistics')
   if (statistics == null) {
     statistics = new GlobalStatistics('statistics')
+    statistics.uniqueClaimers = ZERO
+    statistics.totalUBIDistributed = ZERO
+    statistics.totalClaims = ZERO
   }
-  statistics.uniqueClaimers = statistics.uniqueClaimers == null ? BigInt.fromI32(1) : statistics.uniqueClaimers.plus(BigInt.fromI32(1))
+  statistics.uniqueClaimers = statistics.uniqueClaimers.plus(BigInt.fromI32(1))
   statistics.save()
 }
 
@@ -124,9 +185,8 @@ export function handleWhitelistedRemoved(event: WhitelistedRemoved): void {
   let citizen = WalletStat.load(event.params.account.toHex())
 
   if (citizen == null) {
-    citizen = new WalletStat(event.params.account.toHex())
+    citizen = initCitizen(event.params.account.toHex())
     citizen.dateAppeared = event.block.timestamp
-    citizen.claimStreak = ZERO
 
   }
 
@@ -137,6 +197,9 @@ export function handleWhitelistedRemoved(event: WhitelistedRemoved): void {
   let statistics = GlobalStatistics.load('statistics')
   if (statistics == null) {
     statistics = new GlobalStatistics('statistics')
+    statistics.uniqueClaimers = ZERO
+    statistics.totalUBIDistributed = ZERO
+    statistics.totalClaims = ZERO
   }
   statistics.uniqueClaimers = statistics.uniqueClaimers.minus(BigInt.fromI32(1))
   statistics.save()
@@ -150,20 +213,12 @@ function aggregateDailyUbiFromUBIClaimed(event: UBIClaimed): void {
     return
   }
 
-  let dailyUbi = DailyUBI.load(currentDay.toString())  //cant be null because event to create day must happened before
+  let dailyUbi = DailyUBI.load(currentDay.toString()) as DailyUBI  //cant be null because event to create day must happened before
 
-  dailyUbi.ubiSchemeAddress = event.address
-  if (dailyUbi.totalUBIDistributed == null) {
-    dailyUbi.totalUBIDistributed = event.params.amount
-  } else {
-    dailyUbi.totalUBIDistributed = dailyUbi.totalUBIDistributed.plus(event.params.amount)
-  }
-
-  if (dailyUbi.totalClaims == null) {
-    dailyUbi.totalClaims = BigInt.fromI32(1)
-  } else {
-    dailyUbi.totalClaims = dailyUbi.totalClaims.plus(BigInt.fromI32(1))
-  }
+  dailyUbi.ubiSchemeAddress = event.address  
+  dailyUbi.totalUBIDistributed = dailyUbi.totalUBIDistributed.plus(event.params.amount)
+  dailyUbi.totalClaims = dailyUbi.totalClaims.plus(BigInt.fromI32(1))
+  
 
   // if (isUniqueClaimer == true) {
   //   if (dailyUbi.uniqueClaimers == null) {
@@ -174,7 +229,7 @@ function aggregateDailyUbiFromUBIClaimed(event: UBIClaimed): void {
 
   // }
 
-  if(enableLogs) log.info('handleUBIClaimed dailyUbi.id {}, dailyUbi.totalUBIDistributed {}, dailyUbi.newClaimers {}, contract address {}', [dailyUbi.id.toString(), dailyUbi.totalUBIDistributed.toString(), dailyUbi.newClaimers.toString(), event.address.toHexString()])
+  if(enableLogs) log.info('handleUBIClaimed dailyUbi.id {}, dailyUbi.totalUBIDistributed {}, dailyUbi.newClaimers {}, contract address {}', [dailyUbi.id.toString(), dailyUbi.totalUBIDistributed.toString(), event.address.toHexString()])
 
   dailyUbi.save()
 }
@@ -183,13 +238,12 @@ function aggregateStatisticsFromUBIClaimed(event: UBIClaimed): void {
   let statistics = GlobalStatistics.load('statistics')
   if (statistics == null) {
     statistics = new GlobalStatistics('statistics')
+    statistics.uniqueClaimers = ZERO
+    statistics.totalUBIDistributed = ZERO
+    statistics.totalClaims = ZERO    
   }
-
-  if (statistics.totalUBIDistributed == null) {
-    statistics.totalUBIDistributed = event.params.amount
-  } else {
-    statistics.totalUBIDistributed = statistics.totalUBIDistributed.plus(event.params.amount)
-  }
+  
+  statistics.totalUBIDistributed = statistics.totalUBIDistributed.plus(event.params.amount)  
 
   // if (isUniqueClaimer == true) {
   //   if (statistics.uniqueClaimers == null) {
@@ -200,11 +254,9 @@ function aggregateStatisticsFromUBIClaimed(event: UBIClaimed): void {
 
   // }
 
-  if (statistics.totalClaims == null) {
-    statistics.totalClaims = BigInt.fromI32(1)
-  } else {
-    statistics.totalClaims = statistics.totalClaims.plus(BigInt.fromI32(1))
-  }
+  
+  statistics.totalClaims = statistics.totalClaims.plus(BigInt.fromI32(1))
+  
 
   if(enableLogs) log.info('statistics.uniqueClaimers {}', [statistics.uniqueClaimers.toString()])
 
@@ -217,7 +269,7 @@ function aggregateCitizenFromUBIClaimed(event: UBIClaimed): void {
   let citizen = WalletStat.load(event.params.claimer.toHex())
   let isUniqueClaimer = false
   if (citizen == null) {
-    citizen = new WalletStat(event.params.claimer.toHexString())
+    citizen = initCitizen(event.params.claimer.toHexString())
     citizen.dateAppeared = event.block.timestamp
     citizen.lastClaimed = event.block.timestamp
     citizen.claimStreak = BigInt.fromI32(1)
@@ -270,6 +322,10 @@ function handleActiveUser(user: Address, isActive: boolean): void {
   if(enableLogs) log.info("handleActiveUser {} {}",[user.toHexString(), isActive.toString()])
   
   let citizen = WalletStat.load(user.toHexString())
+  if(citizen === null)
+  {
+    citizen = initCitizen(user.toHexString());
+  }
   citizen.isActiveUser = isActive;
   citizen.save()
 
