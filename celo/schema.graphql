@@ -1,4 +1,4 @@
-type DailyUBI @entity {
+type DailyUBI @entity(immutable: false) {
   id: ID!
   pool: BigInt!
   quota: BigInt!
@@ -13,7 +13,7 @@ type DailyUBI @entity {
   dayInCycle: BigInt!
 }
 
-type WalletStat @entity {
+type WalletStat @entity(immutable: false) {
   id: ID!
   dateAppeared: BigInt!
   balance: BigInt!
@@ -41,7 +41,7 @@ type WalletStat @entity {
   lastTransactionTo: BigInt!
 }
 
-type TransactionStat @entity {
+type TransactionStat @entity(immutable: false) {
   id: ID!
   dayStartBlockNumber: BigInt!
   transactionsCount: BigInt!
@@ -51,27 +51,10 @@ type TransactionStat @entity {
   totalInCirculation: BigInt!
 }
 
-type GlobalStatistics @entity {
+type GlobalStatistics @entity(immutable: false) {
   id: ID!
   TransactionStat: TransactionStat
   totalUBIDistributed: BigInt!
   uniqueClaimers: BigInt!
   totalClaims: BigInt!
-}
-
-type UBICollected @entity {
-  id: ID!
-  contract: Bytes, 
-  block: BigInt!
-  blockTimestamp: BigInt!
-  ubi: BigDecimal!
-  communityPool: BigDecimal!
-}
-
-type UBIHistory @entity {
-  id: ID! 
-  block: BigInt!
-  blockTimestamp: BigInt!  
-  totalDailyUBI: BigDecimal!
-  totalDailyCommunityPool: BigDecimal!
 }

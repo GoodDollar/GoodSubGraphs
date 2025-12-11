@@ -1,0 +1,19 @@
+{
+  "network": "celo",
+  "ubiScheme": {
+    "address": "0x43d72Ff17701B2DA814620735C39C620Ce0ea4A1",
+    "startBlock": 18006679
+  },  
+  "goodDollar": {
+    "address": "0x62B8B11039FcfE5aB0C56E502b1C372A3d2a9c7A",
+    "startBlock": 17237955
+  },
+  "oneTimePayments": {
+    "address": "0xB27D247f5C2a61D2Cb6b6E67FEE51d839447e97d",
+    "startBlock": 17237955
+  },
+  "identity": {
+    "address": "0xC361A6E67822a0EDc17D899227dd9FC50BD62F42",
+    "startBlock": 17237955
+  }
+}

@@ -4,11 +4,15 @@ schema:
 dataSources: 
   - kind: ethereum/contract
     name: UBIScheme
-    network: celo
+    network: {{network}}
     source:
-      address: '0x43d72Ff17701B2DA814620735C39C620Ce0ea4A1'
+      address: '{{ubiScheme.address}}'
       abi: UBIScheme
-      startBlock: 18006679
+      startBlock: {{ubiScheme.startBlock}}
+    context:
+      gdTokenAddress:
+        type: String
+        data: '{{goodDollar.address}}'
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -35,11 +39,11 @@ dataSources:
 
   - kind: ethereum/contract
     name: GoodDollar
-    network: celo
+    network: {{network}}
     source:
-      address: '0x62B8B11039FcfE5aB0C56E502b1C372A3d2a9c7A'
+      address: '{{goodDollar.address}}'
       abi: GoodDollar
-      startBlock: 17237955 
+      startBlock: {{goodDollar.startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -58,11 +62,11 @@ dataSources:
 
   - kind: ethereum/contract
     name: OneTimePayments
-    network: celo
+    network: {{network}}
     source:
-      address: '0xB27D247f5C2a61D2Cb6b6E67FEE51d839447e97d'
+      address: '{{oneTimePayments.address}}'
       abi: OneTimePayments
-      startBlock: 17237955
+      startBlock: {{oneTimePayments.startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -81,11 +85,11 @@ dataSources:
 
   - kind: ethereum/contract
     name: Identity
-    network: celo
+    network: {{network}}
     source:
-      address: '0xC361A6E67822a0EDc17D899227dd9FC50BD62F42'
+      address: '{{identity.address}}'
       abi: Identity
-      startBlock: 17237955
+      startBlock: {{identity.startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
