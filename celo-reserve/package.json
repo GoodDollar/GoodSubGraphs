@@ -1,0 +1,31 @@
+{
+  "name": "GoodSubGraphsCelo",
+  "license": "UNLICENSED",
+  "scripts": {
+    "gv": "graph version",
+    "codegen": "graph codegen",
+    "build": "npm run contract-releases && graph build",
+    "deploy": "graph deploy good-dollar-reserve-celo",
+    "create-local": "graph create --node http://localhost:8020/ GoodDollar/GoodDollarCelo",
+    "remove-local": "graph remove --node http://localhost:8020/ GoodDollar/GoodDollarCelo",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 GoodDollar/GoodDollarCelo",
+    "dev": "npm run codegen && npm run deploy-local",
+    "dev:nodemon": "node_modules/nodemon/bin/nodemon.js --exec 'npm run dev' --ignore build/ --ignore generated/ --ext 'ts,json,graphql,yaml'",
+    "contract-releases": "node scripts/get-contract-releases.js"
+  },
+  "dependencies": {
+    "@gooddollar/bridge-contracts": "^1.0.14",
+    "@gooddollar/goodcontracts": "^2.6.2",
+    "@gooddollar/goodprotocol": "^2.0.24",
+    "@graphprotocol/graph-cli": "^0.98.1",
+    "@graphprotocol/graph-ts": "^0.38.2",
+    "mustache": "^4.2.0"
+  },
+  "version": "0.0.0",
+  "devDependencies": {
+    "@types/mustache": "^4",
+    "lodash.merge": "^4.6.2",
+    "nodemon": "^2.0.6"
+  },
+  "packageManager": "yarn@4.12.0"
+}

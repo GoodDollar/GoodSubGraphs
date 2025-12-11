@@ -1,0 +1,40 @@
+type ReservePrice @entity(immutable: true) {
+  "Exchange ID combined with timestamp"
+  id: ID!
+  
+  "The exchange ID from the Swap event"
+  exchangeId: Bytes!
+  
+  "The exchange provider address"
+  exchangeProvider: Bytes!
+  
+  "The current price from IBancorExchangeProvider.currentPrice()"
+  price: BigInt!
+  
+  "Transaction timestamp"
+  timestamp: BigInt!
+  
+  "Day ID (timestamp / 86400)"
+  day: BigInt!
+  
+  "Token in address from the swap"
+  tokenIn: Bytes!
+  
+  "Token out address from the swap"
+  tokenOut: Bytes!
+  
+  "Amount in from the swap"
+  amountIn: BigInt!
+  
+  "Amount out from the swap"
+  amountOut: BigInt!
+  
+  "User who initiated the swap"
+  user: Bytes!
+  
+  "Block number"
+  blockNumber: BigInt!
+  
+  "Transaction hash"
+  transactionHash: Bytes!
+}
