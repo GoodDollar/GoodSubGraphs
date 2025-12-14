@@ -69,6 +69,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@gooddollar/bridge-contracts@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "@gooddollar/bridge-contracts@npm:1.2.0"
+  checksum: 10c0/e7fa13431b86ac6618cd6bf4cff0f818726df6d795b2e8158fc52d0f417ac2c26bb9df2a2e104d7c2bf8c5298ffdaf3ae78659b739833a47b6e46e1423eef72f
+  languageName: node
+  linkType: hard
+
 "@gooddollar/goodcontracts@npm:^2.6.2":
   version: 2.6.6
   resolution: "@gooddollar/goodcontracts@npm:2.6.6"
@@ -977,6 +984,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "GoodSubGraphsFuse@workspace:."
   dependencies:
+    "@gooddollar/bridge-contracts": "npm:^1.2.0"
     "@gooddollar/goodcontracts": "npm:^2.6.2"
     "@gooddollar/goodprotocol": "npm:^2.1.1"
     "@graphprotocol/graph-cli": "npm:^0.98.1"
