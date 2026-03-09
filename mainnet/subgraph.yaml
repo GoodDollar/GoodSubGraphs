@@ -1,4 +1,4 @@
-specVersion: 0.0.2
+specVersion: 0.0.4
 description: GoodDollar Statistics
 repository: https://github.com/GoodDollar/GoodSubGraphs
 schema:
@@ -13,7 +13,7 @@ dataSources:
   #     startBlock: 10699082
   #   mapping:
   #     kind: ethereum/events
-  #     apiVersion: 0.0.5
+  #     apiVersion: 0.0.6
   #     language: wasm/assemblyscript
   #     entities:
   #       - ReserveHistory
@@ -34,7 +34,7 @@ dataSources:
       startBlock: 10569404
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - ReserveHistory
@@ -63,7 +63,7 @@ dataSources:
       startBlock: 13835700
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - ReserveHistory
@@ -92,7 +92,7 @@ dataSources:
       startBlock: 14296152
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - ReserveHistory
@@ -121,7 +121,7 @@ dataSources:
       startBlock:  10569404
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - ReserveHistory
@@ -150,7 +150,7 @@ dataSources:
       startBlock:  13835700
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - ReserveHistory
@@ -181,7 +181,7 @@ dataSources:
       startBlock:  14296271
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - ReserveHistory
@@ -212,7 +212,7 @@ dataSources:
       startBlock:  10569404
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - StakingHistory
@@ -237,7 +237,7 @@ dataSources:
       startBlock:  13835700
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - StakingHistory
@@ -262,7 +262,7 @@ dataSources:
       startBlock:  13835700
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - StakingHistory
@@ -287,7 +287,7 @@ dataSources:
       startBlock:  14132483
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - StakingHistory
@@ -312,7 +312,7 @@ dataSources:
       startBlock:  14132483
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - StakingHistory
@@ -337,7 +337,7 @@ dataSources:
       startBlock:  14132483
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - StakingHistory
@@ -362,7 +362,7 @@ dataSources:
       startBlock:  14132483
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - StakingHistory
@@ -386,7 +386,7 @@ dataSources:
       abi: GReputation
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Balance

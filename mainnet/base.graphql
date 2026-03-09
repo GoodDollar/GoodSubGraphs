@@ -1,4 +1,4 @@
-type ReserveHistory @entity {
+type ReserveHistory @entity(immutable: false) {
   id: ID!
   block: BigInt
   blockTimestamp: BigInt
@@ -18,31 +18,31 @@ type ReserveHistory @entity {
   volumeGD: BigDecimal!
 }
 
-type StakeHistory @entity {
+type StakeHistory @entity(immutable: false) {
   id: ID!
   totalUSDStaked: BigDecimal!
   stakingContracts: [ContractStakeHistory!]!
 }
 
-type ContractStakeHistory @entity {
+type ContractStakeHistory @entity(immutable: false) {
   id: ID!
   day: BigInt!
   contract: StakeStatistic!
   totalUSDStaked: BigDecimal!
   totalTokenStaked: BigDecimal!
-  supporters:[Supporter!]!
+  supporters: [Supporter!]!
   opValues: [BigDecimal!]!
 }
 
-type Supporter @entity {
+type Supporter @entity(immutable: false) {
   id: ID!
   totalUSDStaked: BigDecimal!
-  stakingContracts:  [ContractStakeHistory!]! @derivedFrom(field: "supporters")
+  stakingContracts: [ContractStakeHistory!]! @derivedFrom(field: "supporters")
 }
 
-type StakeStatistic @entity {
+type StakeStatistic @entity(immutable: false) {
   id: ID!
   totalUSDStaked: BigDecimal!
   totalTokenStaked: BigDecimal!
-  contractStakeHistory:  [ContractStakeHistory!] @derivedFrom(field: "contract")
+  contractStakeHistory: [ContractStakeHistory!] @derivedFrom(field: "contract")
 }

@@ -1,6 +1,7 @@
 {
-  "name": "GoodSubGraphs",
+  "name": "goodsubgraphs",
   "license": "UNLICENSED",
+  "version": "1.0.0",
   "scripts": {
     "copyGood": "cp ../fuse2/src/good.ts src && cp ../fuse2/abis/GReputation.json abis && cp ../fuse2/schema.graphql good.graphql && cat warn.graphql base.graphql good.graphql warn.graphql > schema.graphql",
     "codegen": "yarn copyGood && graph codegen",
@@ -12,7 +13,8 @@
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 GoodDollar/GoodSubGraphs2"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "^0.23.2",
-    "@graphprotocol/graph-ts": "^0.23.1"
-  }
+    "@graphprotocol/graph-cli": "^0.98.1",
+    "@graphprotocol/graph-ts": "^0.38.2"
+  },
+  "packageManager": "yarn@3.6.1+sha256.811210abb5fb5751da12ead8a9cbc0c150b07e43ac9cbedec6752d22abfd2bd6"
 }

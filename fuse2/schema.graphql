@@ -1,4 +1,4 @@
-type Minter @entity {
+type Minter @entity(immutable: false) {
   id: ID! # address
   totalMintCap: BigInt!
   perTxCap: BigInt!
@@ -8,7 +8,7 @@ type Minter @entity {
   totalBurned: BigInt!
 }
 
-type MintBurnStats @entity {
+type MintBurnStats @entity(immutable: false) {
   id: ID!
   totalMintCap: BigInt
   totalMinted: BigInt
@@ -17,7 +17,7 @@ type MintBurnStats @entity {
   totalBurned: BigInt
 }
 
-type InvitesStats @entity {
+type InvitesStats @entity(immutable: false) {
   id: ID!
   totalApprovedInvites: BigInt!
   totalPending: BigInt!
@@ -25,7 +25,7 @@ type InvitesStats @entity {
   totalInvited: BigInt!
 }
 
-type User @entity {
+type User @entity(immutable: false) {
   id: ID!
   invitedBy: User
   bountyPaid: Boolean!
@@ -41,25 +41,25 @@ type User @entity {
   earnedAsInvitee: BigInt!
 }
 
-type GoodBalance @entity {
- id: ID!
- "GOOD tokens minted on current blockchain"
- coreBalance: BigInt!
- "Delegated + Own undelegated GOOD on current blockchain"
- activeVotes: BigInt!
- "total activeVotes on other blockchains from state proof"
- blockchainsBalance: BigInt!
- "total voting power = activeVotes + blockchainsBalance"
- totalVotes: BigInt!
- stateProofs: [StateProof!]! @derivedFrom(field: "account")
- delegators: [GoodBalance!]! @derivedFrom(field: "delegatee")
- "account we are delegating to"
- delegatee: GoodBalance
- memberSince: BigInt!
- lastUpdate: BigInt!
+type GoodBalance @entity(immutable: false) {
+  id: ID!
+  "GOOD tokens minted on current blockchain"
+  coreBalance: BigInt!
+  "Delegated + Own undelegated GOOD on current blockchain"
+  activeVotes: BigInt!
+  "total activeVotes on other blockchains from state proof"
+  blockchainsBalance: BigInt!
+  "total voting power = activeVotes + blockchainsBalance"
+  totalVotes: BigInt!
+  stateProofs: [StateProof!]! @derivedFrom(field: "account")
+  delegators: [GoodBalance!]! @derivedFrom(field: "delegatee")
+  "account we are delegating to"
+  delegatee: GoodBalance
+  memberSince: BigInt!
+  lastUpdate: BigInt!
 }
 
-type StateProof @entity {
+type StateProof @entity(immutable: false) {
   id: ID!
   blockchain: String!
   account: GoodBalance!
@@ -67,7 +67,7 @@ type StateProof @entity {
   timestamp: BigInt!
 }
 
-type StateHash @entity {
+type StateHash @entity(immutable: false) {
   id: ID!
   timestamp: BigInt!
   blockchain: String!
