@@ -29,6 +29,8 @@ type WalletStat @entity(immutable: false) {
   totalTransactionsCountClean: BigInt!
   totalTransactionsValue: BigInt!
   totalTransactionsValueClean: BigInt!
+  firstVerified: BigInt!
+  firstClaimed: BigInt!
   lastClaimed: BigInt!
   totalClaimedCount: BigInt!
   totalClaimedValue: BigInt!
@@ -56,5 +58,6 @@ type GlobalStatistics @entity(immutable: false) {
   TransactionStat: TransactionStat
   totalUBIDistributed: BigInt!
   uniqueClaimers: BigInt!
+  uniqueWallets: BigInt!
   totalClaims: BigInt!
 }
