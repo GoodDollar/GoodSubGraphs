@@ -39,6 +39,7 @@ export function handleTransfer(event: Transfer): void {
     statistics.totalClaims = ZERO
     statistics.totalUBIDistributed = ZERO
     statistics.uniqueClaimers = ZERO
+    statistics.uniqueWallets = ZERO
     statistics.save()
   }
 
@@ -108,6 +109,8 @@ function aggregateCitizenFromTransfer(event: Transfer): void {
     citizenFrom.dateJoined = ZERO
     citizenFrom.isActiveUser = false
     citizenFrom.isWhitelisted = false
+    citizenFrom.firstVerified = ZERO
+    citizenFrom.firstClaimed = ZERO
     citizenFrom.lastClaimed = ZERO
     citizenFrom.lastTransactionFrom = ZERO
     citizenFrom.lastTransactionTo = ZERO
@@ -164,6 +167,8 @@ function aggregateCitizenFromTransfer(event: Transfer): void {
     citizenTo.dateJoined = ZERO
     citizenTo.isActiveUser = false
     citizenTo.isWhitelisted = false
+    citizenTo.firstVerified = ZERO
+    citizenTo.firstClaimed = ZERO
     citizenTo.lastClaimed = ZERO
     citizenTo.lastTransactionFrom = ZERO
     citizenTo.lastTransactionTo = ZERO

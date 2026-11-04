@@ -19,6 +19,8 @@ export function initCitizen(id: string): WalletStat {
   citizen.dateJoined = ZERO
   citizen.isActiveUser = false
   citizen.isWhitelisted = false
+  citizen.firstVerified = ZERO
+  citizen.firstClaimed = ZERO
   citizen.lastClaimed = ZERO
   citizen.lastTransactionFrom = ZERO
   citizen.lastTransactionTo = ZERO
@@ -119,6 +121,20 @@ export function handleWhitelistedAdded(event: WhitelistedAdded): void {
     citizen.dateJoined = event.block.timestamp
   }
 
+  if (citizen.firstVerified.equals(ZERO)) {
+    citizen.firstVerified = event.block.timestamp
+    let statistics = GlobalStatistics.load('statistics')
+    if (statistics == null) {
+      statistics = new GlobalStatistics('statistics')
+      statistics.totalClaims = ZERO
+      statistics.totalUBIDistributed = ZERO
+      statistics.uniqueClaimers = ZERO
+      statistics.uniqueWallets = ZERO
+    }
+    statistics.uniqueWallets = statistics.uniqueWallets.plus(BigInt.fromI32(1))
+    statistics.save()
+  }
+
   citizen.isWhitelisted = true
   if (enableLogs) log.info('handleWhitelistedAdded citizen.dateJoined {}', [citizen.dateJoined.toString()])
 
@@ -132,16 +148,6 @@ export function handleWhitelistedAdded(event: WhitelistedAdded): void {
 
   dailyUbi.newClaimers = dailyUbi.newClaimers.plus(BigInt.fromI32(1))
   dailyUbi.save()
-
-  let statistics = GlobalStatistics.load('statistics')
-  if (statistics == null) {
-    statistics = new GlobalStatistics('statistics')
-    statistics.totalClaims = ZERO
-    statistics.totalUBIDistributed = ZERO
-    statistics.uniqueClaimers = ZERO
-  }
-  statistics.uniqueClaimers = statistics.uniqueClaimers.plus(BigInt.fromI32(1))
-  statistics.save()
 }
 
 export function handleWhitelistedRemoved(event: WhitelistedRemoved): void {
@@ -156,17 +162,6 @@ export function handleWhitelistedRemoved(event: WhitelistedRemoved): void {
   citizen.isWhitelisted = false
 
   citizen.save()
-
-  let statistics = GlobalStatistics.load('statistics')
-  if (statistics == null) {
-    statistics = new GlobalStatistics('statistics')
-    statistics.totalClaims = ZERO
-    statistics.totalUBIDistributed = ZERO
-    statistics.uniqueClaimers = ZERO
-  }
-
-  statistics.uniqueClaimers = statistics.uniqueClaimers.minus(BigInt.fromI32(1))
-  statistics.save()
 }
 
 function aggregateDailyUbiFromUBIClaimed(event: UBIClaimed): void {
@@ -212,18 +207,10 @@ function aggregateStatisticsFromUBIClaimed(event: UBIClaimed): void {
     statistics.totalClaims = ZERO
     statistics.totalUBIDistributed = ZERO
     statistics.uniqueClaimers = ZERO
+    statistics.uniqueWallets = ZERO
   }
 
   statistics.totalUBIDistributed = statistics.totalUBIDistributed.plus(event.params.amount)
-
-  // if (isUniqueClaimer == true) {
-  //   if (statistics.uniqueClaimers == null) {
-  //     statistics.uniqueClaimers = BigInt.fromI32(1)
-  //   } else {
-  //     statistics.uniqueClaimers = statistics.uniqueClaimers.plus(BigInt.fromI32(1))
-  //   }
-
-  // }
 
   statistics.totalClaims = statistics.totalClaims.plus(BigInt.fromI32(1))
 
@@ -234,19 +221,31 @@ function aggregateStatisticsFromUBIClaimed(event: UBIClaimed): void {
 
 function aggregateCitizenFromUBIClaimed(event: UBIClaimed): void {
   let citizen = WalletStat.load(event.params.claimer.toHex())
-  let isUniqueClaimer = false
   if (citizen == null) {
     citizen = initCitizen(event.params.claimer.toHexString())
     citizen.dateAppeared = event.block.timestamp
     citizen.lastClaimed = event.block.timestamp
     citizen.claimStreak = BigInt.fromI32(1)
     citizen.longestClaimStreak = BigInt.fromI32(1)
-    isUniqueClaimer = true
   } else {
     if (enableLogs) log.info('handleUBIClaimed claimer found {}, contract address {}', [event.params.claimer.toHexString(), event.address.toHexString()])
   }
 
   let now = event.block.timestamp
+
+  if (citizen.firstClaimed.equals(ZERO)) {
+    citizen.firstClaimed = now
+    let statistics = GlobalStatistics.load('statistics')
+    if (statistics == null) {
+      statistics = new GlobalStatistics('statistics')
+      statistics.totalClaims = ZERO
+      statistics.totalUBIDistributed = ZERO
+      statistics.uniqueClaimers = ZERO
+      statistics.uniqueWallets = ZERO
+    }
+    statistics.uniqueClaimers = statistics.uniqueClaimers.plus(BigInt.fromI32(1))
+    statistics.save()
+  }
 
   let yesterday = now.minus(BigInt.fromI32(24 * 60 * 60))
 
