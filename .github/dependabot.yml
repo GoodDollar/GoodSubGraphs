@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /fuse
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: npm
+    directory: /fuse2
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: npm
+    directory: /mainnet
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: npm
+    directory: /reserve
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: npm
+    directory: /ubi
+    schedule:
+      interval: weekly
