@@ -86,10 +86,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@gooddollar/goodprotocol@npm:^2.1.1":
-  version: 2.1.1
-  resolution: "@gooddollar/goodprotocol@npm:2.1.1"
-  checksum: 10c0/d90141e539443dd79c4db451db7eb31c414553865eaf89ab300f0e091448128667c6ed28acd3d0b800d4dcdfe42383d249115edc2d648807b0bc189ec824ed92
+"@gooddollar/goodprotocol@npm:^2.3.4":
+  version: 2.3.4
+  resolution: "@gooddollar/goodprotocol@npm:2.3.4"
+  checksum: 10c0/2cdf2040809c041341ad1bc7af2fa256d98638bbc0aec6191bae677b554437e9b3bb234aef68fadd1e6a05eae95224505933219b19f18ead888d6b876c9dc13a
   languageName: node
   linkType: hard
 
@@ -99,7 +99,7 @@ __metadata:
   dependencies:
     "@gooddollar/bridge-contracts": "npm:latest"
     "@gooddollar/goodcontracts": "npm:latest"
-    "@gooddollar/goodprotocol": "npm:^2.1.1"
+    "@gooddollar/goodprotocol": "npm:^2.3.4"
     "@graphprotocol/graph-cli": "npm:^0.98.1"
     "@graphprotocol/graph-ts": "npm:^0.38.2"
     lodash.merge: "npm:^4.6.2"
