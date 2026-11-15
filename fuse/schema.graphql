@@ -29,6 +29,8 @@ type WalletStat @entity(immutable: false) {
   totalTransactionsCountClean: BigInt!
   totalTransactionsValue: BigInt!
   totalTransactionsValueClean: BigInt!
+  firstVerified: BigInt!
+  firstClaimed: BigInt!
   lastClaimed: BigInt!
   totalClaimedCount: BigInt!
   totalClaimedValue: BigInt!
@@ -56,22 +58,23 @@ type GlobalStatistics @entity(immutable: false) {
   TransactionStat: TransactionStat
   totalUBIDistributed: BigInt!
   uniqueClaimers: BigInt!
+  uniqueWallets: BigInt!
   totalClaims: BigInt!
 }
 
 type UBICollected @entity(immutable: true) {
   id: ID!
-  contract: Bytes, 
+  contract: Bytes
   block: BigInt
-  blockTimestamp: BigInt  
+  blockTimestamp: BigInt
   ubi: BigDecimal!
   communityPool: BigDecimal!
 }
 
 type UBIHistory @entity(immutable: false) {
-  id: ID! 
+  id: ID!
   block: BigInt
-  blockTimestamp: BigInt  
+  blockTimestamp: BigInt
   totalDailyUBI: BigDecimal!
   totalDailyCommunityPool: BigDecimal!
 }
