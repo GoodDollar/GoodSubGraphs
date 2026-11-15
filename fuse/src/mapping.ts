@@ -22,6 +22,14 @@ import { initCitizen } from "./gd-mapping";
 let ZERO = BigInt.fromI32(0);
 const enableLogs = false;
 
+function initDailyUBI(id: string): DailyUBI {
+  const dailyUbi = new DailyUBI(id);
+  dailyUbi.newClaimers = ZERO;
+  dailyUbi.totalUBIDistributed = ZERO;
+  dailyUbi.totalClaims = ZERO;
+  return dailyUbi;
+}
+
 export function handleUBICalculatedV2(event: UBICalculated): void {
   if (enableLogs)
     log.info(
@@ -62,10 +70,7 @@ export function handleUBICalculatedV2(event: UBICalculated): void {
   );
   let dailyUbi = DailyUBI.load(currentDay.toString());
   if (dailyUbi == null) {
-    dailyUbi = new DailyUBI(currentDay.toString());
-    dailyUbi.newClaimers = BigInt.fromI32(1);
-    dailyUbi.totalUBIDistributed = ZERO;
-    dailyUbi.totalClaims = ZERO;
+    dailyUbi = initDailyUBI(currentDay.toString());
   }
 
   dailyUbi.ubiSchemeAddress = event.address;
@@ -124,10 +129,7 @@ export function handleUBICalculated(event: UBICalculated): void {
   );
   let dailyUbi = DailyUBI.load(currentDay.toString());
   if (dailyUbi == null) {
-    dailyUbi = new DailyUBI(currentDay.toString());
-    dailyUbi.newClaimers = BigInt.fromI32(1);
-    dailyUbi.totalUBIDistributed = ZERO;
-    dailyUbi.totalClaims = ZERO;
+    dailyUbi = initDailyUBI(currentDay.toString());
   }
   dailyUbi.ubiSchemeAddress = event.address;
   dailyUbi.pool = pool;
@@ -153,11 +155,11 @@ export function handleUBIClaimed(event: UBIClaimed): void {
       event.address.toHexString(),
     ]);
 
+  aggregateDailyUbiFromUBIClaimed(event);
+
   aggregateCitizenFromUBIClaimed(event);
 
   aggregateStatisticsFromUBIClaimed(event);
-
-  aggregateDailyUbiFromUBIClaimed(event);
 }
 
 export function handleWhitelistedAdded(event: WhitelistedAdded): void {
@@ -204,13 +206,8 @@ export function handleWhitelistedAdded(event: WhitelistedAdded): void {
   let day = getCurrentDay(activeUbi, event.block.timestamp);
   let dailyUbi = DailyUBI.load(day.toString());
   if (dailyUbi == null) {
-    dailyUbi = new DailyUBI(day.toString());
-    dailyUbi.newClaimers = BigInt.fromI32(1);
-    dailyUbi.totalUBIDistributed = ZERO;
-    dailyUbi.totalClaims = ZERO;
+    dailyUbi = initDailyUBI(day.toString());
   }
-
-  dailyUbi.newClaimers = dailyUbi.newClaimers.plus(BigInt.fromI32(1));
 
   dailyUbi.save();
 }
@@ -242,7 +239,15 @@ function aggregateDailyUbiFromUBIClaimed(event: UBIClaimed): void {
     return;
   }
 
-  let dailyUbi = DailyUBI.load(currentDay.toString()) as DailyUBI; //cant be null because event to create day must happened before
+  let dailyUbi = DailyUBI.load(currentDay.toString());
+  if (dailyUbi == null) {
+    dailyUbi = initDailyUBI(currentDay.toString());
+  }
+
+  let citizen = WalletStat.load(event.params.claimer.toHexString());
+  if (citizen == null || citizen.firstClaimed.equals(ZERO)) {
+    dailyUbi.newClaimers = dailyUbi.newClaimers.plus(BigInt.fromI32(1));
+  }
 
   dailyUbi.ubiSchemeAddress = event.address;
   dailyUbi.totalUBIDistributed = dailyUbi.totalUBIDistributed.plus(
@@ -250,21 +255,13 @@ function aggregateDailyUbiFromUBIClaimed(event: UBIClaimed): void {
   );
   dailyUbi.totalClaims = dailyUbi.totalClaims.plus(BigInt.fromI32(1));
 
-  // if (isUniqueClaimer == true) {
-  //   if (dailyUbi.uniqueClaimers == null) {
-  //     dailyUbi.uniqueClaimers = BigInt.fromI32(1)
-  //   } else {
-  //     dailyUbi.uniqueClaimers = dailyUbi.uniqueClaimers.plus(BigInt.fromI32(1))
-  //   }
-
-  // }
-
   if (enableLogs)
     log.info(
       "handleUBIClaimed dailyUbi.id {}, dailyUbi.totalUBIDistributed {}, dailyUbi.newClaimers {}, contract address {}",
       [
         dailyUbi.id.toString(),
         dailyUbi.totalUBIDistributed.toString(),
+        dailyUbi.newClaimers.toString(),
         event.address.toHexString(),
       ],
     );

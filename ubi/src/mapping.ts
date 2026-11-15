@@ -126,11 +126,11 @@ export function handleUBIClaimed(event: UBIClaimed): void {
       event.address.toHexString(),
     ]);
 
+  aggregateDailyUbiFromUBIClaimed(event);
+
   aggregateCitizenFromUBIClaimed(event);
 
   aggregateStatisticsFromUBIClaimed(event);
-
-  aggregateDailyUbiFromUBIClaimed(event);
 }
 
 export function handleWhitelistedAdded(event: WhitelistedAdded): void {
@@ -177,7 +177,6 @@ export function handleWhitelistedAdded(event: WhitelistedAdded): void {
     dailyUbi = initDailyUBI(day.toString());
   }
 
-  dailyUbi.newClaimers = dailyUbi.newClaimers.plus(BigInt.fromI32(1));
   dailyUbi.save();
 }
 
@@ -205,38 +204,34 @@ function aggregateDailyUbiFromUBIClaimed(event: UBIClaimed): void {
     return;
   }
 
-  let dailyUbi = DailyUBI.load(currentDay.toString()); //cant be null because event to create day must happened before
+  let dailyUbi = DailyUBI.load(currentDay.toString());
+  if (dailyUbi == null) {
+    dailyUbi = initDailyUBI(currentDay.toString());
+  }
 
-  if (dailyUbi) {
-    dailyUbi.ubiSchemeAddress = event.address;
-    dailyUbi.totalUBIDistributed = dailyUbi.totalUBIDistributed.plus(
-      event.params.amount,
+  let citizen = WalletStat.load(event.params.claimer.toHexString());
+  if (citizen == null || citizen.firstClaimed.equals(ZERO)) {
+    dailyUbi.newClaimers = dailyUbi.newClaimers.plus(BigInt.fromI32(1));
+  }
+
+  dailyUbi.ubiSchemeAddress = event.address;
+  dailyUbi.totalUBIDistributed = dailyUbi.totalUBIDistributed.plus(
+    event.params.amount,
+  );
+  dailyUbi.totalClaims = dailyUbi.totalClaims.plus(BigInt.fromI32(1));
+
+  if (enableLogs)
+    log.info(
+      "handleUBIClaimed dailyUbi.id {}, dailyUbi.totalUBIDistributed {}, dailyUbi.newClaimers {}, contract address {}",
+      [
+        dailyUbi.id.toString(),
+        dailyUbi.totalUBIDistributed.toString(),
+        dailyUbi.newClaimers.toString(),
+        event.address.toHexString(),
+      ],
     );
 
-    dailyUbi.totalClaims = dailyUbi.totalClaims.plus(BigInt.fromI32(1));
-
-    // if (isUniqueClaimer == true) {
-    //   if (dailyUbi.uniqueClaimers == null) {
-    //     dailyUbi.uniqueClaimers = BigInt.fromI32(1)
-    //   } else {
-    //     dailyUbi.uniqueClaimers = dailyUbi.uniqueClaimers.plus(BigInt.fromI32(1))
-    //   }
-
-    // }
-
-    if (enableLogs)
-      log.info(
-        "handleUBIClaimed dailyUbi.id {}, dailyUbi.totalUBIDistributed {}, dailyUbi.newClaimers {}, contract address {}",
-        [
-          dailyUbi.id.toString(),
-          dailyUbi.totalUBIDistributed.toString(),
-          dailyUbi.newClaimers.toString(),
-          event.address.toHexString(),
-        ],
-      );
-
-    dailyUbi.save();
-  }
+  dailyUbi.save();
 }
 
 function aggregateStatisticsFromUBIClaimed(event: UBIClaimed): void {
